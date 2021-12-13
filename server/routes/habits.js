@@ -6,13 +6,13 @@ const habitController = require('../controllers/habit')
 // create habits 
 router.post('/', habitController.create);
 
-// Delete habits
-router.delete('/:id', habitController.destory);
+// displays all users habits 
+router.get('/', habitController)
 
-// history of all habit data 
-router.get('/history', habitController.history);
 
-// homepage 
-router.get('/homepage', habitController.display);
+
+
+
+
 
 module.exports = router;

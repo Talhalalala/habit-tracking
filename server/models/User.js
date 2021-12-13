@@ -1,8 +1,8 @@
 const db = require('../db_config/config');
-const SQL = require('sql-template-strings');
 
 class User {
     constructor(data){
+        this.id = data.id
         this.username = data.username
         this.email = data.email 
         this.hpassword = data.hpassword
@@ -11,8 +11,8 @@ class User {
     static create({ username, email, hpassword }){
         return new Promise(async (res, rej) => {
             try {
-                let result = await db.run(SQL`INSERT INTO users (username, email, hpassword)
-                                                VALUES (${username}, ${email}, ${hpassword}) RETURNING *;`);
+                let result = await db.query(`INSERT INTO users (username, email, hpassword)
+                                            VALUES ($1, $2, $3) RETURNING *;`, [username, email, hpassword]);
                 let user = new users(result.rows[0]);
                 res(user)
             } catch (err) {
@@ -24,8 +24,8 @@ class User {
     static findByEmail(email){
         return new Promise(async (res, rej) => {
             try {
-                let result = await db.run(SQL`SELECT * FROM users
-                                                WHERE email = ${email};`);
+                let result = await db.query(`SELECT * FROM users
+                                            WHERE email = $1;`, [email]);
                 let user = new User(result.rows[0])
                 res(user)
             } catch (err) {
@@ -33,7 +33,6 @@ class User {
             }
         })
     }
-
     
 }
 
