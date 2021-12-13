@@ -7,8 +7,8 @@ server.use(express.json());
 
 const authRoutes = require('./routes/auth')
 // const habitRoutes = require('./routes/habits')
-// server.use('/books', authRoutes)
-// server.use('/authors', habitRoutes)
+server.use('/auth', authRoutes)
+// server.use('/habit', habitRoutes)
 
 server.get('/', (req, res) => res.send('Hello'))
 
