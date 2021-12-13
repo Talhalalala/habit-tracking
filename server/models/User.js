@@ -8,6 +8,18 @@ class User {
         this.hpassword = data.hpassword
     }
 
+    static get all() {
+        return new Promise (async (resolve, reject) => {
+            try {
+                let usersData = await db.query('SELECT * FROM users');
+                let users = usersData.rows.map(u => new User(u));
+                resolve (users);
+            } catch (err) {
+                reject('Users not found');
+            }
+        });
+    }
+
     static create({ username, email, hpassword }){
         return new Promise(async (res, rej) => {
             try {
