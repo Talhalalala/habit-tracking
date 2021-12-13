@@ -16,8 +16,7 @@ CREATE TABLE habits (
     frequency INT, 
     goal INT, 
     units VARCHAR(50),
-    streak INT, 
-    long_streak INT
+    streak INT
 );
 
 DROP TABLE IF EXISTS habit_data;
@@ -28,5 +27,5 @@ CREATE TABLE habit_data (
     interval_start DATE,
     interval_end DATE,
     habit_amount INT, 
-    habit_achieved bit,
+    habit_achieved BOOLEAN
 );
