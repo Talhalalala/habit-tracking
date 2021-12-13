@@ -28,13 +28,13 @@ class habit {
         })
     }
 
-    static async create(habitData){
+    static create(habitData){
         return new Promise (async (resolve, reject) => {
             try {
-                const { habit, frequency, goal, units} = habitData;
+                const { habit, frequency, goal, units, username} = habitData;
                 // let user = await User.find(??);
                 let newHabit = await db.query('INSERT INTO habits (habit, frequency, goal, units) VALUES ($1, $2, $3, $4) RETURNING *;'
-                                            [ habits, frequency, goal, units ]);
+                                            [ habit, frequency, goal, units ]);
                 resolve (result.rows[0]);
             } catch (err) {
                 reject ('Habit could not be created');
@@ -70,9 +70,15 @@ class habit {
         })
     
     }
+
+    static update(new) {
+        return new Promise(async(resolve, reject) => {
+            try
+        })
+    }
 }
 
 
 
-module.exports = habit
+module.exports = habit;
 
