@@ -11,13 +11,15 @@ const main = document.querySelector("main");
 
 function renderLoginForm() {
 	const fields = [
-		{ tag: "label", textContent: "Email", attributes: { for: "email" } },
-		{ tag: "input", attributes: { type: "email", name: "email" } },
-		{ tag: "label", textContent: "Password", attributes: { for: "password" } },
-		{ tag: "input", attributes: { type: "password", name: "password" } },
-		{ tag: "input", attributes: { type: "submit", value: "Login" } }
+		{ tag: "label", textContent: "Email:", attributes: { for: "email", class: "label" } },
+		{ tag: "input", attributes: { type: "email", name: "email", class: "input" } },
+		{ tag: "label", textContent: "Password:", attributes: { for: "password", class: "label" } },
+		{ tag: "input", attributes: { type: "password", name: "password", class: "input" } },
+		{ tag: "input", attributes: { type: "submit", value: "Login", class: "submit" } }
 	];
 	const form = document.createElement("form");
+	form.id = "loginForm";
+	form.setAttribute("class", "authForm");
 	fields.forEach(f => {
 		let field = document.createElement(f.tag);
 		if (f.textContent) {
@@ -34,17 +36,26 @@ function renderLoginForm() {
 
 function renderRegisterForm() {
 	const fields = [
-		{ tag: "label", textContent: "Username", attributes: { for: "username" } },
-		{ tag: "input", attributes: { type: "text", name: "username" } },
-		{ tag: "label", textContent: "Email", attributes: { for: "email" } },
-		{ tag: "input", attributes: { type: "email", name: "email" } },
-		{ tag: "label", textContent: "Password", attributes: { for: "password" } },
-		{ tag: "input", attributes: { type: "password", name: "password" } },
-		{ tag: "label", textContent: "Confirm Password", attributes: { for: "passwordConfirmation" } },
-		{ tag: "input", attributes: { type: "password", name: "passwordConfirmation" } },
-		{ tag: "input", attributes: { type: "submit", value: "Create Account" } }
+		{ tag: "label", textContent: "Username", attributes: { for: "username", class: "label" } },
+		{ tag: "input", attributes: { type: "text", name: "username", class: "input" } },
+		{ tag: "label", textContent: "Email", attributes: { for: "email", class: "label" } },
+		{ tag: "input", attributes: { type: "email", name: "email", class: "input" } },
+		{ tag: "label", textContent: "Password", attributes: { for: "password", class: "label" } },
+		{ tag: "input", attributes: { type: "password", name: "password", class: "input" } },
+		{
+			tag: "label",
+			textContent: "Confirm Password",
+			attributes: { for: "passwordConfirmation", class: "label" }
+		},
+		{
+			tag: "input",
+			attributes: { type: "password", name: "passwordConfirmation", class: "input" }
+		},
+		{ tag: "input", attributes: { type: "submit", value: "Create Account", class: "submit" } }
 	];
 	const form = document.createElement("form");
+	form.id = "registerForm";
+	form.setAttribute("class", "authForm");
 	fields.forEach(f => {
 		let field = document.createElement(f.tag);
 		if (f.textContent) {
@@ -104,18 +115,32 @@ const renderHabits = habitData => {
 
 function renderNewHabit() {
 	const fields = [
-		{ tag: "label", textContent: "Habit Name", attributes: { for: "habit" } },
-		{ tag: "input", attributes: { type: "text", name: "habit" } },
-		{ tag: "label", textContent: "Frequency", attributes: { for: "frequency" } },
-		{ tag: "input", attributes: { type: "text", name: "frequency" } },
-		{ tag: "label", textContent: "Goal", attributes: { for: "goal" } },
-		{ tag: "input", attributes: { type: "text", name: "goal" } },
-		{ tag: "label", textContent: "Units", attributes: { for: "unit" } },
-		{ tag: "input", attributes: { type: "text", name: "unit" } },
-		{ tag: "input", attributes: { type: "submit", value: "Login" } }
+		{ tag: "label", textContent: "Habit to track:", attributes: { for: "habit", class: "label" } },
+		{ tag: "input", attributes: { type: "text", name: "habit", class: "input" } },
+		{
+			tag: "label",
+			textContent: "Complete every _ days:",
+			attributes: { for: "frequency", class: "label" }
+		},
+		{ tag: "input", attributes: { type: "text", name: "frequency", class: "input" } },
+		{
+			tag: "label",
+			textContent: "Complete _ times every cycle:",
+			attributes: { for: "goal", class: "label" }
+		},
+		{ tag: "input", attributes: { type: "text", name: "goal", class: "input" } },
+		{
+			tag: "label",
+			textContent: "The goal is measured in:",
+			attributes: { for: "unit", class: "label" }
+		},
+		{ tag: "input", attributes: { type: "text", name: "unit", class: "input" } },
+		{ tag: "input", attributes: { type: "submit", value: "Add habit", class: "submit" } }
 	];
 
 	const form = document.createElement("form");
+	form.id = "newHabitForm";
+	form.setAttribute("class", "authForm");
 	fields.forEach(f => {
 		let field = document.createElement(f.tag);
 		if (f.textContent) {
