@@ -1,5 +1,5 @@
 const { logout, currentUser } = require('./auth')
-const { renderHomepage, renderLoginForm, renderRegisterForm } = require('./content')
+const { renderLoginForm, renderRegisterForm } = require('./content')
 
 const nav = document.querySelector('nav');
 const main = document.querySelector('main');
@@ -33,17 +33,19 @@ function updateMain(path) {
                 renderLoginForm(); break;
             case '#register':
                 renderRegisterForm(); break;
+            case '#today':
+                renderToday(); break;
             default:
                 render404(); break;
         }
     } else {
-        renderHomepage();
+        window.location.hash = '#login';
     }
 }
 
 function createNavLink(route){
     const link = document.createElement('a');
-    link.textContent = route === '#' ? 'Home' : `${route[1].toUpperCase()}${route.substring(2)}`;
+    link.textContent = `${route[1].toUpperCase()}${route.substring(2)}`;
     link.href = route;
     return link;
 }

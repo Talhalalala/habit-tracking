@@ -38,7 +38,7 @@ function login(token){
     localStorage.setItem("token", token);
     localStorage.setItem("username", user.username);
     localStorage.setItem("userEmail", user.email);
-    window.location.hash = '#feed';
+    window.location.hash = '#today';
 }
 
 function logout(){
@@ -53,17 +53,15 @@ function currentUser(){
 
 module.exports = { requestLogin, requestRegistration, login, logout, currentUser }
 },{}],2:[function(require,module,exports){
-const { requestLogin, requestRegistration } = require('./auth')
+const { requestLogin, requestRegistration, currentUser } = require('./auth')
 
 const main = document.querySelector('main');
 
-function renderHomepage(){
-    const logo = document.createElement('img');
-    logo.id = 'logo';
-    logo.src = 'https://res.cloudinary.com/getfutureproof/image/upload/v1595323029/futureproof_logotype_withBleed_huge_kl2rol.png';
-    logo.alt = 'futureproof logo'
-    main.appendChild(logo);
-}
+// function renderHomepage(){
+//     const title = document.createElement('h2')
+//     title.textContent = "Get yourself and your habits on track"
+//     main.appendChild(title)
+// }
 
 
 function renderLoginForm() {
@@ -112,10 +110,49 @@ function renderRegisterForm() {
     main.appendChild(form);
 }
 
-module.exports = { renderHomepage, renderLoginForm, renderRegisterForm }
+async function RenderToday() {
+    let data =  await getTodaysHabits(currentUser())
+    const feed = document.createElement('section');
+    feed.id = 'feed';
+    if(data.err){return}
+    
+    posts.forEach(renderHabits);
+    main.appendChild(feed);
+}
+
+const renderHabits = habitData => {
+    const post = document.createElement('div');
+    post.className = 'post';
+    const habit = document.createElement('h3');
+    const frequency = document.createElement('p');
+    habit.textContent = habitData.habitName;
+    frequency.textContent = `Every ${habitData.frequency} days`;
+    const fields = [
+        { tag: 'label', textContent:`Amount (${habitData.frequency})`, attributes: { for: 'amount' }},
+        { tag: 'input', attributes: { type: 'text', name: 'amount' } },
+        { tag: 'input', attributes: { type: 'submit', value: 'Log Data' } }
+    ]
+    const form = document.createElement('form');
+    form.id = habitData.habit_ID
+    fields.forEach(f => {
+        let field = document.createElement(f.tag);
+        if (f.textContent) { field.textContent = f.textContent }
+        Object.entries(f.attributes).forEach(([a, v]) => {
+            field.setAttribute(a, v);
+            form.appendChild(field);
+        })
+    })
+    form.addEventListener('submit', updateHabit)
+    main.appendChild(form);
+    post.appendChild(user);
+    post.appendChild(body);
+    feed.appendChild(post);
+}
+
+module.exports = { renderLoginForm, renderRegisterForm }
 },{"./auth":1}],3:[function(require,module,exports){
 const { logout, currentUser } = require('./auth')
-const { renderHomepage, renderLoginForm, renderRegisterForm } = require('./content')
+const { renderLoginForm, renderRegisterForm } = require('./content')
 
 const nav = document.querySelector('nav');
 const main = document.querySelector('main');
@@ -149,17 +186,19 @@ function updateMain(path) {
                 renderLoginForm(); break;
             case '#register':
                 renderRegisterForm(); break;
+            case '#today':
+                renderToday(); break;
             default:
                 render404(); break;
         }
     } else {
-        renderHomepage();
+        window.location.hash = '#login';
     }
 }
 
 function createNavLink(route){
     const link = document.createElement('a');
-    link.textContent = route === '#' ? 'Home' : `${route[1].toUpperCase()}${route.substring(2)}`;
+    link.textContent = `${route[1].toUpperCase()}${route.substring(2)}`;
     link.href = route;
     return link;
 }
@@ -178,5 +217,46 @@ function updateContent(){
 
 updateContent();
 },{"./auth":1,"./content":2}],4:[function(require,module,exports){
+const { logout } = require("./auth");
 
-},{}]},{},[1,2,3,4]);
+async function getTodaysHabits(username) {
+    try {
+        const options = {
+            headers: new Headers({"Authorization": localStorage.getItem("token")})
+        };
+        const response = await fetch("http://localhost:3000/URL", options); //get correct route
+        const data = await response.json();
+        if (data.err) {
+            console.warn(data.err);
+            logout();
+        }
+        return data;
+    } catch (err) {
+        console.warn(err);
+    }
+}
+
+async function updateHabit(e) {
+    try {
+        e.preventDefault();
+        const habitId = e.target.id
+        const value = e.target.value;
+        const userEmail = localStorage.getItem("userEmail")
+        const options = {
+            method: "POST",
+            headers: new Headers({"Authorization": localStorage.getItem("token"), "Content-Type": "application/json"}),
+            body: JSON.stringify({email: userEmail, habit_ID: habitId, amount: value})
+        }
+        const response = await fetch("URL", options); //get route
+        const data = await response.json();
+        if (data.err) {
+            console.warn(data.err)
+        }
+        return data;
+    } catch (err) {
+        console.warn(err)
+    }
+}
+
+module.exports = { getTodaysHabits };
+},{"./auth":1}]},{},[1,2,3,4]);

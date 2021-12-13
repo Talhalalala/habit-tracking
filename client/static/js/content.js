@@ -1,14 +1,12 @@
-const { requestLogin, requestRegistration } = require('./auth')
+const { requestLogin, requestRegistration, currentUser } = require('./auth')
 
 const main = document.querySelector('main');
 
-function renderHomepage(){
-    const logo = document.createElement('img');
-    logo.id = 'logo';
-    logo.src = 'https://res.cloudinary.com/getfutureproof/image/upload/v1595323029/futureproof_logotype_withBleed_huge_kl2rol.png';
-    logo.alt = 'futureproof logo'
-    main.appendChild(logo);
-}
+// function renderHomepage(){
+//     const title = document.createElement('h2')
+//     title.textContent = "Get yourself and your habits on track"
+//     main.appendChild(title)
+// }
 
 
 function renderLoginForm() {
@@ -57,4 +55,43 @@ function renderRegisterForm() {
     main.appendChild(form);
 }
 
-module.exports = { renderHomepage, renderLoginForm, renderRegisterForm }
+async function RenderToday() {
+    let data =  await getTodaysHabits(currentUser())
+    const feed = document.createElement('section');
+    feed.id = 'feed';
+    if(data.err){return}
+    
+    posts.forEach(renderHabits);
+    main.appendChild(feed);
+}
+
+const renderHabits = habitData => {
+    const post = document.createElement('div');
+    post.className = 'post';
+    const habit = document.createElement('h3');
+    const frequency = document.createElement('p');
+    habit.textContent = habitData.habitName;
+    frequency.textContent = `Every ${habitData.frequency} days`;
+    const fields = [
+        { tag: 'label', textContent:`Amount (${habitData.frequency})`, attributes: { for: 'amount' }},
+        { tag: 'input', attributes: { type: 'text', name: 'amount' } },
+        { tag: 'input', attributes: { type: 'submit', value: 'Log Data' } }
+    ]
+    const form = document.createElement('form');
+    form.id = habitData.habit_ID
+    fields.forEach(f => {
+        let field = document.createElement(f.tag);
+        if (f.textContent) { field.textContent = f.textContent }
+        Object.entries(f.attributes).forEach(([a, v]) => {
+            field.setAttribute(a, v);
+            form.appendChild(field);
+        })
+    })
+    form.addEventListener('submit', updateHabit)
+    main.appendChild(form);
+    post.appendChild(user);
+    post.appendChild(body);
+    feed.appendChild(post);
+}
+
+module.exports = { renderLoginForm, renderRegisterForm }
