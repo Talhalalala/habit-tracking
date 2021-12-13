@@ -1,4 +1,5 @@
 const { requestLogin, requestRegistration, currentUser } = require('./auth')
+const { getHabits, getInfoAboutHabit, updateHabit } = require("./requests")
 
 const main = document.querySelector('main');
 
@@ -56,12 +57,12 @@ function renderRegisterForm() {
 }
 
 async function RenderToday() {
-    let data =  await getTodaysHabits(currentUser())
+    let data =  await getHabits(currentUser())
     const feed = document.createElement('section');
     feed.id = 'feed';
     if(data.err){return}
     
-    posts.forEach(renderHabits);
+    data.forEach(renderHabits);
     main.appendChild(feed);
 }
 

@@ -1,17 +1,33 @@
 const { logout } = require("./auth");
 
-async function getTodaysHabits(username) {
+async function getHabits(username) {
     try {
         const options = {
             headers: new Headers({"Authorization": localStorage.getItem("token")})
         };
-        const response = await fetch("http://localhost:3000/URL", options); //get correct route
+        const response = await fetch("http://localhost:3000/URL", options); // get correct route to get names of all habits
         const data = await response.json();
         if (data.err) {
             console.warn(data.err);
             logout();
         }
         return data;
+    } catch (err) {
+        console.warn(err);
+    }
+}
+
+async function getInfoAboutHabit(id) {
+    try {
+        const options = {
+            headers: new Headers({"Authorization": localStorage.getItem("token")})
+        };
+        const response = await fetch("http://localhost:3000/URL", options); // get correct route to get details of the habit
+        const data = await response.json();
+        if (data.err) {
+            console.warn(data.err);
+            logout();
+        }
     } catch (err) {
         console.warn(err);
     }
@@ -39,4 +55,4 @@ async function updateHabit(e) {
     }
 }
 
-module.exports = { getTodaysHabits };
+module.exports = { getHabits, updateHabit, getInfoAboutHabit };
