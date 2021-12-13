@@ -13,8 +13,8 @@ class User {
             try {
                 let result = await db.run(SQL`INSERT INTO users (username, email, hpassword)
                                                 VALUES (${username}, ${email}, ${hpassword}) RETURNING *;`);
-                let users = new users(result.rows[0]);
-                res(users)
+                let user = new users(result.rows[0]);
+                res(user)
             } catch (err) {
                 rej(`Error creating user: ${err}`)
             }
@@ -38,4 +38,4 @@ class User {
 }
 
 
-module.exports = User
+module.exports = User;
