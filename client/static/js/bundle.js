@@ -7,7 +7,7 @@ async function requestLogin(e) {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
 		};
-		const r = await fetch(`http://localhost:3000/auth/login`, options); //Change route depending on server side guys
+		const r = await fetch(`http://localhost:3000/auth/login`, options);
 		const data = await r.json();
 		if (!data.success) {
 			throw new Error("Login not authorised");
