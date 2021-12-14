@@ -1,11 +1,16 @@
 const { logout } = require("./auth");
 
-async function getHabits(username) {
+async function getHabits(id) {
 	try {
 		const options = {
-			headers: new Headers({ Authorization: localStorage.getItem("token") })
+			method: "POST",
+			headers: new Headers({
+				Authorization: localStorage.getItem("token"),
+				"Content-Type": "application/json"
+			}),
+			body: JSON.stringify({ user_id: id })
 		};
-		const response = await fetch("http://localhost:3000/URL", options); // get correct route to get names of all habits
+		const response = await fetch("http://localhost:3000/habit", options); // get correct route to get names of all habits
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -17,17 +22,23 @@ async function getHabits(username) {
 	}
 }
 
-async function getInfoAboutHabit(id) {
+async function getInfoAboutHabit(habitId, userId) {
 	try {
 		const options = {
-			headers: new Headers({ Authorization: localStorage.getItem("token") })
+			method: "POST",
+			headers: new Headers({
+				Authorization: localStorage.getItem("token"),
+				"Content-Type": "application/json"
+			}),
+			body: JSON.stringify({ user_id: userId })
 		};
-		const response = await fetch("http://localhost:3000/URL", options); // get correct route to get details of the habit
+		const response = await fetch(`http://localhost:3000/habit/${habitId}`, options); // get correct route to get details of the habit
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
 			logout();
 		}
+		return data;
 	} catch (err) {
 		console.warn(err);
 	}
@@ -45,7 +56,7 @@ async function updateHabit(e) {
 				Authorization: localStorage.getItem("token"),
 				"Content-Type": "application/json"
 			}),
-			body: JSON.stringify({ user_ID: userId, habit_ID: habitId, amount: value })
+			body: JSON.stringify({ user_id: userId, habit_ID: habitId, amount: value })
 		};
 		const response = await fetch("URL", options); //get route for updating the habit
 		const data = await response.json();

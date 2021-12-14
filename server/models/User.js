@@ -40,7 +40,6 @@ class User {
 		return new Promise(async (res, rej) => {
 			try {
 				let result = await db.query(`SELECT * FROM users WHERE email = $1;`, [email]);
-				console.log(result.rows[0]);
 				let user = new User(result.rows[0]);
 				res(user);
 			} catch (err) {
@@ -53,7 +52,6 @@ class User {
 		return new Promise(async (res, rej) => {
 			try {
 				let result = await db.query(`SELECT * FROM users WHERE user_id = $1;`, [id]);
-				console.log(result.rows[0]);
 				let user = new User(result.rows[0]);
 				res(user);
 			} catch (err) {
@@ -62,20 +60,16 @@ class User {
 		});
 	}
 
-
-
-
-    get destroy(){
-        return new Promise(async(resolve, reject) => {
-            try {
-                const result = await db.query('DELETE FROM users WHERE id = $1 RETURNING id;', [ this.id ]);
-                resolve(`User ${result.username} was deleted`)
-            } catch (err) {
-                reject('User could not be deleted')
-            }
-        })   
-    }
-
+	get destroy() {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const result = await db.query("DELETE FROM users WHERE id = $1 RETURNING id;", [this.id]);
+				resolve(`User ${result.username} was deleted`);
+			} catch (err) {
+				reject("User could not be deleted");
+			}
+		});
+	}
 }
 
 module.exports = User;

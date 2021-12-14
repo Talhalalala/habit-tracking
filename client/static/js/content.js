@@ -65,31 +65,51 @@ function renderRegisterForm() {
 }
 
 async function renderToday() {
-	let data = await getHabits(currentUser());
+	let userId = localStorage.getItem("userId");
+	let data = await getHabits(userId);
 	const feed = document.createElement("section");
 	feed.id = "feed";
+	main.appendChild(feed);
+	console.log(data);
 	if (data.err) {
 		return;
 	}
-
 	data.forEach(renderHabits);
-	main.appendChild(feed);
 }
 
-const renderHabits = habitData => {
+function renderHabits(habitData) {
+	const feed = document.querySelector("#feed");
 	const post = document.createElement("div");
 	post.className = "post";
 	const habit = document.createElement("h3");
-	const frequency = document.createElement("p");
-	habit.textContent = habitData.habitName;
-	frequency.textContent = `Every ${habitData.frequency} days`;
+	const goal = document.createElement("p");
+	habit.textContent = habitData.habit;
+	goal.textContent = `Every ${habitData.frequency} day(s), complete ${habitData.goal} ${habitData.units}`;
+
+	const moreinfobutton = document.createElement("button");
+	moreinfobutton.addEventListener("click", moreInfoAboutHabit);
+	moreinfobutton.setAttribute("class", `${habitData.habit_id}`);
+	moreinfobutton.textContent = "More Info";
+
+	post.appendChild(habit);
+	post.appendChild(goal);
+	post.appendChild(moreinfobutton);
+	feed.appendChild(post);
+}
+
+function moreInfoAboutHabit(e) {
+	e.preventDefault();
+	const habitId = e.target.classList[0];
+	const userId = localStorage.getItem("userId");
+	const habitData = getInfoAboutHabit(habitId, userId);
+	console.log(habitData);
 	const fields = [
 		{ tag: "label", textContent: `Amount (${habitData.frequency})`, attributes: { for: "amount" } },
 		{ tag: "input", attributes: { type: "text", name: "amount" } },
 		{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
 	];
 	const form = document.createElement("form");
-	form.id = habitData.habit_ID;
+	form.setAttribute("class", habitId);
 	fields.forEach(f => {
 		let field = document.createElement(f.tag);
 		if (f.textContent) {
@@ -102,10 +122,7 @@ const renderHabits = habitData => {
 	});
 	form.addEventListener("submit", updateHabit);
 	main.appendChild(form);
-	post.appendChild(user);
-	post.appendChild(body);
-	feed.appendChild(post);
-};
+}
 
 function renderNewHabit() {
 	const fields = [

@@ -21,7 +21,6 @@ async function register(req, res) {
 async function login(req, res) {
 	try {
 		const user = await User.findByEmail(req.body.email);
-		console.log(user);
 		if (!user) {
 			throw new Error("No user with this email");
 		}
@@ -37,7 +36,7 @@ async function login(req, res) {
 					token: "Bearer " + token
 				});
 			};
-			jwt.sign(payload, process.env.SECRET, { expiresIn: 60 }, sendToken);
+			jwt.sign(payload, process.env.SECRET, { expiresIn: 3600 }, sendToken);
 		} else {
 			throw new Error("User could not be authenticated");
 		}
@@ -57,14 +56,14 @@ async function showUsers(req, res) {
 	}
 }
 
-async function destroy (req, res) {
-    try {
-        const user = await User.findById(req.params.id);
-        const res = await user.destroy;
-        res.status(204).end();
-    } catch (err) {
-        res.status(404).json({err});
-    }
+async function destroy(req, res) {
+	try {
+		const user = await User.findById(req.params.id);
+		const res = await user.destroy;
+		res.status(204).end();
+	} catch (err) {
+		res.status(404).json({ err });
+	}
 }
 
 module.exports = { register, login, showUsers, destroy };
