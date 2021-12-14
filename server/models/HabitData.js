@@ -18,18 +18,21 @@ class Habit_Data{
     static createHabitData(habitData){
         return new Promise (async (resolve, reject) => {
             try {
-                const { habit_amount, interval_start }
+                const { interval_start , interval_end} = habitData;
+                let newHabitData = await db.query('INSERT INTO habit_data (interval_start, interval_end) VALUES (CAST( GETDATE() AS Date), ) ')
+            } catch {
+
             }
         })
     }
     
-    static increaseAmount(habit_data_id){
-        return new Promise(async (resolve, reject) => {
-            try {
-                let result = await 
-            }
-        })
-    }
+//     static increaseAmount(habit_data_id){
+//         return new Promise(async (resolve, reject) => {
+//             try {
+//                 let result = await 
+//             }
+//         })
+//     }
 
 }
 
