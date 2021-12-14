@@ -4,7 +4,7 @@ const User = require('./User');
 
 class Habit {
     constructor(data){
-        this.habit_id = data.habit_id
+        this.habit_id = data.habit_data_id
         this.id = data.user_id
         this.habit = data.habit 
         this.frequency = data.frequency
@@ -17,10 +17,9 @@ class Habit {
     static allUserHabits(user_id){
         return new Promise(async (res, rej) => {
             try {
-                let result = await db.query(`SELECT * from habits where user_ID = $1;`,
-                                            [user_id]);
-                let habits = result.rows.map(r => new Habit(r))
-                res(habits)
+                let results = await db.query(`SELECT * from habits where user_ID = $1;`, [user_id]);
+                let habits = results.rows.map(r => new Habit(r));
+                res(habits);
             } catch (err) {
                 rej(`Error retrieving habits: ${err}`)
             }
@@ -30,10 +29,14 @@ class Habit {
     static OneUserHabit(user_id, habit_id){
         return new Promise (async (resolve, reject) => {
             try {
-                let result = await db.query('SELECT * from habits where habit_ID = $1 AND user_ID = $2;',
-                                                [habit_id, user_ID]);
-                let habit = result.rows.map(r => new Habit(r))
-                resolve(habit)
+                let results = await db.query('SELECT * from habits where habit_ID = $1 AND user_ID = $2;',
+                                                [habit_id, user_id]);
+                if (results.length){
+                    let habit = new Habit(results.rows[0]);
+                    resolve(habit)
+                } else {
+                    throw 'This user has no habits with this habit_id'
+                }
             } catch (err)  {
                 reject(`Error retrieving the habit: ${err}`)
             }
@@ -46,9 +49,9 @@ class Habit {
     static create(habitData){
         return new Promise (async (resolve, reject) => {
             try {
-                const { habit, frequency, goal, units, user_ID} = habitData;
-                let newHabit = await db.query('INSERT INTO habits (habit, frequency, goal, units, user_ID) VALUES ($1, $2, $3, $4, $5) RETURNING *;',
-                                            [ habit, frequency, goal, units, user_ID ]);
+                const { habit, goal, units, user_ID} = habitData;
+                let newHabit = await db.query('INSERT INTO habits (habit, goal, units, user_ID) VALUES ($1, $2, $3, $4) RETURNING *;',
+                                            [ habit, goal, units, user_id ]);
                 let r = new Habit(newHabit.rows[0])
                 resolve(r);
             } catch (err) {
