@@ -28,4 +28,13 @@ async function displayAllForOne(req, res) {
     }
 }
 
-module.exports = { addNewDataEntry, displayAll, displayAllForOne }
+async function displayEverything(req, res) {
+    try {
+        const habits = await Habit_Data.everything;
+        res.status(200).json(habits)
+    } catch (err) {
+        res.status(404).json({err})
+    }
+}
+
+module.exports = { addNewDataEntry, displayAll, displayAllForOne, displayEverything }

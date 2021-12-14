@@ -7,12 +7,24 @@ const Habit = require('./Habit');
 
 class Habit_Data{
     constructor(data){
-        this.habit_id = data.habit_ID
         this.data_id = data.habit_data_id
+        this.habit_id = data.habit_id
         this.start = data.interval_start
         this.end = data.interval_end
         this.amount = data.habit_amount
         this.achieved = data.habit_achieved
+    }
+    
+    static get everything() {
+        return new Promise(async (res, rej) => {
+            try {
+                let result = await db.query(`SELECT * from habit_data;`);
+                let habits_data = result.rows.map(r => new Habit_Data(r))
+                res(habits_data)
+            } catch (err) {
+                rej(`Error retrieving habits data: ${err}`)
+            }
+        })
     }
 
     static createHabitData(habitData){
@@ -35,7 +47,10 @@ class Habit_Data{
 //         })
 //     }
 
+    
 }
+
+module.exports = Habit_Data
 
 
 
