@@ -2,7 +2,7 @@ const db = require("../db_config/config");
 
 class User {
 	constructor(data) {
-		this.id = data.user_ID;
+		this.id = data.user_id;
 		this.username = data.username;
 		this.email = data.email;
 		this.hpassword = data.hpassword;
@@ -39,11 +39,8 @@ class User {
 	static findByEmail(email) {
 		return new Promise(async (res, rej) => {
 			try {
-				let result = await db.query(
-					`SELECT * FROM users
-                                            WHERE email = $1;`,
-					[email]
-				);
+				let result = await db.query(`SELECT * FROM users WHERE email = $1;`, [email]);
+				console.log(result.rows[0]);
 				let user = new User(result.rows[0]);
 				res(user);
 			} catch (err) {
