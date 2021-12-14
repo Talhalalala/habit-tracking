@@ -17,6 +17,9 @@ CREATE TABLE habits (
     goal INT, 
     units VARCHAR(50),
     streak INT
+    FOREIGN KEY(user_ID)
+        REFERENCES user(user_ID)
+        ON DELETE SET NULL
 );
 
 DROP TABLE IF EXISTS habit_data;
