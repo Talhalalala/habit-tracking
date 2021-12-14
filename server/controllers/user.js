@@ -47,4 +47,14 @@ async function login(req, res) {
 	}
 }
 
-module.exports = { register, login };
+async function showUsers(req, res) {
+	try {
+		const users = await User.all;
+		res.status(200).json(users);
+	} catch (err) {
+		console.log(err);
+		res.status(401).json({ err });
+	}
+}
+
+module.exports = { register, login, showUsers };

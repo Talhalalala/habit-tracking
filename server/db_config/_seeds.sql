@@ -1,6 +1,6 @@
-INSERT INTO users (username, email, hpassword) 
+INSERT INTO users (user_ID, username, email, hpassword) 
 Values
-    ('example', 'exampleemail@email.com', 'examplepassword');
+    (1, 'example', 'exampleemail@email.com', 'examplepassword');
 
 INSERT INTO habits (habit_ID, user_ID, habit, frequency, goal, units, streak)
 Values
