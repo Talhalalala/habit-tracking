@@ -15,7 +15,8 @@ function updateNav() {
 	let logoutBtn;
 	if (currentUser()) {
 		links = privateRoutes.map(createNavLink);
-		logoutBtn = document.createElement("button");
+		logoutBtn = document.createElement("a");
+		logoutBtn.setAttribute("class", "navLink");
 		logoutBtn.textContent = "Logout";
 		logoutBtn.onclick = logout;
 		nav.appendChild(logoutBtn);

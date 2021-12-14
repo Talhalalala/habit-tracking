@@ -3,12 +3,6 @@ const { getHabits, getInfoAboutHabit, updateHabit, addHabit } = require("./reque
 
 const main = document.querySelector("main");
 
-// function renderHomepage(){
-//     const title = document.createElement('h2')
-//     title.textContent = "Get yourself and your habits on track"
-//     main.appendChild(title)
-// }
-
 function renderLoginForm() {
 	const fields = [
 		{ tag: "label", textContent: "Email:", attributes: { for: "email", class: "label" } },
