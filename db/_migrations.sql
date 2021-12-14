@@ -13,10 +13,9 @@ CREATE TABLE habits (
     habit_id serial PRIMARY KEY, 
     user_id INT,
     habit VARCHAR(100),
-    frequency INT, 
     goal INT, 
     units VARCHAR(50),
-    streak INT,
+    streak INT NOT NULL,
     FOREIGN KEY(user_id)
         REFERENCES users(user_id)
         ON DELETE SET NULL
@@ -27,8 +26,7 @@ DROP TABLE IF EXISTS habit_data;
 CREATE TABLE habit_data (
     habit_data_id serial PRIMARY KEY, 
     habit_id INT,
-    interval_start DATE,
-    interval_end DATE,
+    habit_date DATE,
     habit_amount INT, 
-    habit_achieved BOOLEAN
+    habit_achieved BOOLEAN DEFAULT false
 );
