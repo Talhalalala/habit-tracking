@@ -7,7 +7,7 @@ async function requestLogin(e) {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
 		};
-		const r = await fetch(`http://localhost:3000/auth/login`, options); //Change route depending on server side guys
+		const r = await fetch(`http://localhost:3000/auth/login`, options);
 		const data = await r.json();
 		if (!data.success) {
 			throw new Error("Login not authorised");
@@ -64,12 +64,6 @@ const { requestLogin, requestRegistration, currentUser } = require("./auth");
 const { getHabits, getInfoAboutHabit, updateHabit, addHabit } = require("./requests");
 
 const main = document.querySelector("main");
-
-// function renderHomepage(){
-//     const title = document.createElement('h2')
-//     title.textContent = "Get yourself and your habits on track"
-//     main.appendChild(title)
-// }
 
 function renderLoginForm() {
 	const fields = [
@@ -237,7 +231,8 @@ function updateNav() {
 	let logoutBtn;
 	if (currentUser()) {
 		links = privateRoutes.map(createNavLink);
-		logoutBtn = document.createElement("button");
+		logoutBtn = document.createElement("a");
+		logoutBtn.setAttribute("class", "navLink");
 		logoutBtn.textContent = "Logout";
 		logoutBtn.onclick = logout;
 		nav.appendChild(logoutBtn);
