@@ -28,12 +28,24 @@ class Habit_Data{
         })
     }
     
+    static homepage(user_id) {
+        return new Promise(async (res, rej) => {
+            try{
+                let results = await db.query('SELECT habits.*, habit_data.* FROM habits INNER JOIN habit_data ON habits.habit_id = habit_data.habit_id WHERE habits.user_id = $1 AND habit_data.habit_date = CURRENT_DATE', [user_id])
+                res(results.rows)
+            } catch (err) {
+                rej(`Error retrieving homepage habit data: ${err}`)
+            }
+        })
+    }
+
+
     // Read all data for one habit (history)
     static readHistoricalHabitData(habit_id){
         return new Promise(async (res, rej) => {
             try{
                 let results = await db.query('SELECT * FROM habit_data where habit_id = $1;', [habit_id]);
-                if (results.length){
+                if (results.rows.length){
                     let habitEvents = results.rows.map(r => new Habit_Data(r));
                     res(habitEvents);
                 } else {
@@ -47,12 +59,11 @@ class Habit_Data{
 
 
     // Read one habit data 
-    static readOneHabitData(habit_id, eventDate){
+    static readOneHabitData(habit_id){
         return new Promise(async (res, rej) => {
             try{
-                let results = await db.query('SELECT * from habit_data where habit_id = $1 AND habit_date = $2;',
-                                            [habit_id, eventDate]);
-                if (results.length){ 
+                let results = await db.query('SELECT * from habit_data where habit_id = $1 AND habit_date = CURRENT_DATE;', [habit_id]);
+                if (results.rows.length){ 
                     let event = new Habit_Data(results.rows[0]);
                     res(event)
                 } else {
@@ -67,21 +78,41 @@ class Habit_Data{
 
     // Update habitData
     update(habit_amount){
-        let result = await db.query(`UPDATE habit_data SET habit_amount = $1 WHERE habit_data_id = $2;`, [habit_amount, this.data_id]);
+        return new Promise(async (res, rej) => {
+            try{
+                let result = await db.query(`UPDATE habit_data SET habit_amount = $1 WHERE habit_data_id = $2 RETURNING *;`, [habit_amount, this.data_id]);
+            } catch (err) {
+                rej(`Error updating one event data: ${err}`)
+            }
+        })
     }
 
-
-    // static get everything() {
+    // static get AllTodayHabits() {
     //     return new Promise(async (res, rej) => {
     //         try {
-    //             let result = await db.query(`SELECT habit_data_id, habit_id, interval_start::date, interval_end::date, habit_amount, habit_achieved from habit_data;`);
-    //             let habits_data = result.rows.map(r => new Habit_Data(r))
-    //             res(habits_data)
+    //             let result = await db.query('SELECT habit_data.*, habits.goal AS goal,  ')
+                
+    //             // let result = await db.query(`SELECT * from habit_data;`);
+    //             // let habits_data = result.rows.map(r => new Habit_Data(r))
+    //             // res(habits_data)
     //         } catch (err) {
     //             rej(`Error retrieving habits data: ${err}`)
     //         }
     //     })
     // }
+
+
+    static get everything() {
+        return new Promise(async (res, rej) => {
+            try {
+                let result = await db.query(`SELECT * from habit_data;`);
+                let habits_data = result.rows.map(r => new Habit_Data(r))
+                res(habits_data)
+            } catch (err) {
+                rej(`Error retrieving habits data: ${err}`)
+            }
+        })
+    }
 
     // static checkIfExistsIfNotCreate(habit_id, habit_amount) {
     //     return new Promise (async (resolve, reject) => {
@@ -157,6 +188,8 @@ class Habit_Data{
 
     
 }
+
+
 
 module.exports = Habit_Data
 

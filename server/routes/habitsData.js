@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { CheckIfExistsIfNotCreate, addNewDataEntry, displayAll, displayAllForOne, displayEverything } = require('../controllers/habitData')
+const { createAndOrUpdate, displayEverything, TodayHabit, AllHabitHistory, AllTodayHabits, Homepage } = require('../controllers/habitData')
 const { verifyToken } = require('../middleware/auth')
 
 const Habit_Data = require('../models/HabitData')
@@ -14,49 +14,29 @@ const Habit_Data = require('../models/HabitData')
 // router.post('/:id', verifyToken, displayAllForOne)
 
 // Create new entry or update existing one in current interval
-router.post('/', verifyToken, checkIfExistsIfNotCreate)
+// router.post('/', verifyToken, checkIfExistsIfNotCreate)
 
 
 // display all habits data table entries
 router.get('/', displayEverything) // dev end-point used to show everything in habits data table 
 
+// updates existing entry or creates new one
+router.post('/', verifyToken, createAndOrUpdate);
 
-router.post('/update', async (req, res) => {
-    let habit_id = req.body.habit_id;
-    let amount = req.body.habit_amount;
-    let habitDataObject = null;
+// returns all habits for today if they exist or blank otherwise
+// router.get('/today', AllTodayHabits) //Ignore this route
 
-    try {
-        // Attempt to retrieve
-        habitDataObject = await readOneHabitData(habit_id, date);
-    } catch (err){
-        // Does not exist, so create a new one
-        const initialHabitData = {
-            habit_id: habit_id,
-            habit_date: getCurrentDate(),
-            habit_amount: 0,
-            habit_achieved: false
-        };
-        try{
-            habitDataObject = await Habit_Data.create(initialHabitData);
-        } catch (err){
-            res(501);
-        }
-    }
+// returns todays record of the habit if it exists
+router.get('/:id', TodayHabit)
 
-    let newAmount = habitDataObject.amount + amount;
-    habitDataObject.update(newAmount);
-    res(201);
-    
-});
+// returns all the history on a given habit
+router.get('/all/:id', AllHabitHistory)
 
-// Test everything
+// returns everything needed for homepage
+router.get('/homepage/:id', Homepage) // Use this new Route for the homepage to load everything at once
 
 
-// DO LATER
-function getCurrentDate(){
-    return '10.10.2001'
-}
+
 
 
 module.exports = router;
