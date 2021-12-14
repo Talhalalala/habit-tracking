@@ -31,7 +31,7 @@ class Habit {
 			try {
 				let result = await db.query("SELECT * from habits where habit_ID = $1 AND user_ID = $2;", [
 					habit_id,
-					user_id
+					user_ID
 				]);
 				let habit = result.rows.map(r => new Habit(r));
 				resolve(habit);
@@ -56,6 +56,18 @@ class Habit {
 				resolve(r);
 			} catch (err) {
 				reject("Habit could not be created");
+			}
+		});
+	}
+
+	static get everything() {
+		return new Promise(async (res, rej) => {
+			try {
+				let result = await db.query(`SELECT * from habits;`);
+				let habits = result.rows.map(r => new Habit(r));
+				res(habits);
+			} catch (err) {
+				rej(`Error retrieving habits: ${err}`);
 			}
 		});
 	}
