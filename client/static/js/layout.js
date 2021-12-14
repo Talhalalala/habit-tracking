@@ -15,7 +15,8 @@ function updateNav() {
 	let logoutBtn;
 	if (currentUser()) {
 		links = privateRoutes.map(createNavLink);
-		logoutBtn = document.createElement("button");
+		logoutBtn = document.createElement("a");
+		logoutBtn.setAttribute("class", "navLink");
 		logoutBtn.textContent = "Logout";
 		logoutBtn.onclick = logout;
 		nav.appendChild(logoutBtn);
@@ -52,6 +53,7 @@ function updateMain(path) {
 
 function createNavLink(route) {
 	const link = document.createElement("a");
+	link.setAttribute("class", "navLink");
 	link.textContent = `${route[1].toUpperCase()}${route.substring(2)}`;
 	link.href = route;
 	return link;
