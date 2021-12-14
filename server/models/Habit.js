@@ -17,7 +17,7 @@ class Habit {
     static allUserHabits(user_id){
         return new Promise(async (res, rej) => {
             try {
-                let result = await db.query(`SELECT * from habits where user_ID = 1$;`,
+                let result = await db.query(`SELECT * from habits where user_ID = $1;`,
                                             [user_id]);
                 let habits = result.rows.map(r => new Habit(r))
                 res(habits)
@@ -30,7 +30,7 @@ class Habit {
     static OneUserHabit(user_id, habit_id){
         return new Promise (async (resolve, reject) => {
             try {
-                let result = await db.query('SELECT * from habits where habit_ID = $1 AND user_ID = 2$;',
+                let result = await db.query('SELECT * from habits where habit_ID = $1 AND user_ID = $2;',
                                                 [habit_id, user_ID]);
                 let habit = result.rows.map(r => new Habit(r))
                 resolve(habit)
@@ -68,7 +68,7 @@ class Habit {
         })
     };
 
-    
+
 
 }
 

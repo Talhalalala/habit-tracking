@@ -18,10 +18,11 @@ class Habit_Data{
     static createHabitData(habitData){
         return new Promise (async (resolve, reject) => {
             try {
+                let freq = await db.query('SELECT frequency FROM habits WHERE habit_ID = $1', [this.habit_id])
                 const { interval_start , interval_end} = habitData;
-                let newHabitData = await db.query('INSERT INTO habit_data (interval_start, interval_end) VALUES (CAST( GETDATE() AS Date), ) ')
+                let newHabitData = await db.query('INSERT INTO habit_data (interval_start, interval_end) VALUES (CURRENT_DATE, CURRENT_DATE + integer $1) ) ', [freq])
             } catch {
-
+                
             }
         })
     }
