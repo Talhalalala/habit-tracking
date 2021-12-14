@@ -36,4 +36,4 @@ async function destroy(req, res) {
     }
 }
 
-module.exports = { create, displayAll, displayAHabit }
+module.exports = { create, displayAll, displayAHabit, destroy }

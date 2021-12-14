@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { create, displayAll, displayAHabit } = require('../controllers/habit')
+const { create, displayAll, displayAHabit, destroy } = require('../controllers/habit')
 const { verifyToken } = require('../middleware/auth')
 
 
