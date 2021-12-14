@@ -57,4 +57,14 @@ async function showUsers(req, res) {
 	}
 }
 
-module.exports = { register, login, showUsers };
+async function destroy (req, res) {
+    try {
+        const user = await User.findById(req.params.id);
+        const res = await user.destroy;
+        res.status(204).end();
+    } catch (err) {
+        res.status(404).json({err});
+    }
+}
+
+module.exports = { register, login, showUsers, destroy };
