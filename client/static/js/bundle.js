@@ -146,12 +146,11 @@ function renderHabits(habitData) {
 	const habit = document.createElement("h3");
 	const goal = document.createElement("p");
 	const streak = document.createElement("p");
+	goal.setAttribute("class", "goal-button");
+	streak.setAttribute("class", "streak-button");
 	habit.textContent = `${habitData.habit[0].toUpperCase()}${habitData.habit.substring(1)}`;
-	if (habitData.frequency === 1) {
-		goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every day`;
-	} else {
-		goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every ${habitData.frequency} days`;
-	}
+	habit.setAttribute("class", "habit-class");
+	goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every day`;
 	if (habitData.streak) {
 		streak.textContent = `You've hit your goal ${habitData.streak} times in a row!`;
 	} else {
@@ -208,7 +207,7 @@ function makeHabitInformationForm(habitData) {
 	} else {
 		const habitInfo = document.createElement("p");
 		habitInfo.setAttribute("class", "habit-details");
-		habitInfo.textContent = `You have until ${habitData.interval_end} to meet your goal. You are currently at ${habitData.habit_amount} ${habitData.units}.`;
+		habitInfo.textContent = `You are currently at ${habitData.habit_amount} ${habitData.units}.`;
 		postDiv.appendChild(habitInfo);
 		const fields = [
 			{
@@ -238,7 +237,7 @@ function makeHabitInformationForm(habitData) {
 	//show less button
 	const showlessinfobutton = document.createElement("button");
 	showlessinfobutton.addEventListener("click", showlessInfoAboutHabit);
-	showlessinfobutton.setAttribute("class", `${habitData.habit_id}`);
+	showlessinfobutton.setAttribute("class", `${habitData.habit_id} show-button`);
 	showlessinfobutton.textContent = "Less Info";
 
 	postDiv.appendChild(showlessinfobutton);
@@ -250,13 +249,7 @@ function renderNewHabit() {
 		{ tag: "input", attributes: { type: "text", name: "habit", class: "input" } },
 		{
 			tag: "label",
-			textContent: "Complete every _ days:",
-			attributes: { for: "frequency", class: "label" }
-		},
-		{ tag: "input", attributes: { type: "text", name: "frequency", class: "input" } },
-		{
-			tag: "label",
-			textContent: "Complete _ times every cycle:",
+			textContent: "Daily goal:",
 			attributes: { for: "goal", class: "label" }
 		},
 		{ tag: "input", attributes: { type: "text", name: "goal", class: "input" } },
