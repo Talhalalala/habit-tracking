@@ -65,12 +65,6 @@ const { getHabits, getInfoAboutHabit, updateHabit, addHabit } = require("./reque
 
 const main = document.querySelector("main");
 
-// function renderHomepage(){
-//     const title = document.createElement('h2')
-//     title.textContent = "Get yourself and your habits on track"
-//     main.appendChild(title)
-// }
-
 function renderLoginForm() {
 	const fields = [
 		{ tag: "label", textContent: "Email:", attributes: { for: "email", class: "label" } },
@@ -237,7 +231,8 @@ function updateNav() {
 	let logoutBtn;
 	if (currentUser()) {
 		links = privateRoutes.map(createNavLink);
-		logoutBtn = document.createElement("button");
+		logoutBtn = document.createElement("a");
+		logoutBtn.setAttribute("class", "navLink");
 		logoutBtn.textContent = "Logout";
 		logoutBtn.onclick = logout;
 		nav.appendChild(logoutBtn);
