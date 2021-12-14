@@ -52,6 +52,7 @@ function updateMain(path) {
 
 function createNavLink(route) {
 	const link = document.createElement("a");
+	link.setAttribute("class", "navLink");
 	link.textContent = `${route[1].toUpperCase()}${route.substring(2)}`;
 	link.href = route;
 	return link;
