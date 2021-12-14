@@ -4,7 +4,7 @@ Values
 
 INSERT INTO habits (user_ID, habit, frequency, goal, units, streak)
 Values
-    (1, 'Steps', 1, 10000, 'Day', 3);
+    (1, 'Steps', 1, 10000, 'steps', 3);
 
 INSERT INTO habit_data (habit_ID, interval_start, interval_end, habit_amount, habit_achieved)
 Values

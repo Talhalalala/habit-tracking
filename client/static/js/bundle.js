@@ -142,15 +142,17 @@ function renderHabits(habitData) {
 	const feed = document.querySelector("#feed");
 	const post = document.createElement("div");
 	post.className = "post";
+	post.setAttribute("name", `${habitData.habit_id}`);
 	const habit = document.createElement("h3");
 	const goal = document.createElement("p");
 	habit.textContent = habitData.habit;
-	goal.textContent = `Every ${habitData.frequency} day(s), complete ${habitData.goal} ${habitData.units}`;
+	if (habitData.frequency === 1) {
+		goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every day`;
+	} else {
+		goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every ${habitData.frequency} days`;
+	}
 
-	const moreinfobutton = document.createElement("button");
-	moreinfobutton.addEventListener("click", moreInfoAboutHabit);
-	moreinfobutton.setAttribute("class", `${habitData.habit_id}`);
-	moreinfobutton.textContent = "More Info";
+	const moreinfobutton = createMoreInfoButton(habitData.habit_id);
 
 	post.appendChild(habit);
 	post.appendChild(goal);
@@ -158,19 +160,48 @@ function renderHabits(habitData) {
 	feed.appendChild(post);
 }
 
-function moreInfoAboutHabit(e) {
+function createMoreInfoButton(id) {
+	const moreinfobutton = document.createElement("button");
+	moreinfobutton.addEventListener("click", moreInfoAboutHabit);
+	moreinfobutton.setAttribute("class", `${id}`);
+	moreinfobutton.textContent = "More Info";
+	return moreinfobutton;
+}
+
+async function moreInfoAboutHabit(e) {
 	e.preventDefault();
 	const habitId = e.target.classList[0];
 	const userId = localStorage.getItem("userId");
-	const habitData = getInfoAboutHabit(habitId, userId);
-	console.log(habitData);
+	const habitData = await getInfoAboutHabit(habitId, userId);
+	console.log("habit data", habitData);
+	e.target.remove();
+	makeHabitInformationForm(habitData[0]);
+}
+
+function showlessInfoAboutHabit(e) {
+	e.preventDefault();
+	const habitId = e.target.classList[0];
+	const postDiv = document.querySelector(`div[name='${habitId}']`);
+	const form = document.querySelector(`form[class='${habitId}']`);
+	form.remove(); //removes form
+	const moreInfo = createMoreInfoButton(habitId);
+	postDiv.appendChild(moreInfo);
+	e.target.remove(); //removes button
+}
+
+function makeHabitInformationForm(habitData) {
+	const postDiv = document.querySelector(`div[name='${habitData.habit_id}']`);
 	const fields = [
-		{ tag: "label", textContent: `Amount (${habitData.frequency})`, attributes: { for: "amount" } },
+		{
+			tag: "label",
+			textContent: `Amount (${habitData.frequency})`,
+			attributes: { for: "amount" }
+		},
 		{ tag: "input", attributes: { type: "text", name: "amount" } },
 		{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
 	];
 	const form = document.createElement("form");
-	form.setAttribute("class", habitId);
+	form.setAttribute("class", `${habitData.habit_id}`);
 	fields.forEach(f => {
 		let field = document.createElement(f.tag);
 		if (f.textContent) {
@@ -182,7 +213,15 @@ function moreInfoAboutHabit(e) {
 		});
 	});
 	form.addEventListener("submit", updateHabit);
-	main.appendChild(form);
+	postDiv.appendChild(form);
+
+	//show less button
+	const showlessinfobutton = document.createElement("button");
+	showlessinfobutton.addEventListener("click", showlessInfoAboutHabit);
+	showlessinfobutton.setAttribute("class", `${habitData.habit_id}`);
+	showlessinfobutton.textContent = "Less Info";
+
+	postDiv.appendChild(showlessinfobutton);
 }
 
 function renderNewHabit() {
@@ -204,9 +243,9 @@ function renderNewHabit() {
 		{
 			tag: "label",
 			textContent: "The goal is measured in:",
-			attributes: { for: "unit", class: "label" }
+			attributes: { for: "units", class: "label" }
 		},
-		{ tag: "input", attributes: { type: "text", name: "unit", class: "input" } },
+		{ tag: "input", attributes: { type: "text", name: "units", class: "input" } },
 		{ tag: "input", attributes: { type: "submit", value: "Add habit", class: "submit" } }
 	];
 
@@ -227,7 +266,14 @@ function renderNewHabit() {
 	main.appendChild(form);
 }
 
-module.exports = { renderLoginForm, renderRegisterForm, renderHabits, renderToday, renderNewHabit };
+module.exports = {
+	renderLoginForm,
+	renderRegisterForm,
+	renderHabits,
+	renderToday,
+	renderNewHabit,
+	makeHabitInformationForm
+};
 
 },{"./auth":1,"./requests":4}],3:[function(require,module,exports){
 const { logout, currentUser } = require("./auth");
@@ -364,7 +410,7 @@ async function updateHabit(e) {
 				Authorization: localStorage.getItem("token"),
 				"Content-Type": "application/json"
 			}),
-			body: JSON.stringify({ user_id: userId, habit_ID: habitId, amount: value })
+			body: JSON.stringify({ user_id: userId, habit_id: habitId, amount: value })
 		};
 		const response = await fetch("URL", options); //get route for updating the habit
 		const data = await response.json();
@@ -380,16 +426,21 @@ async function updateHabit(e) {
 async function addHabit(e) {
 	try {
 		e.preventDefault();
+		console.log("adding habit");
+		const bodyObject = Object.fromEntries(new FormData(e.target));
+		bodyObject["user_id"] = localStorage.getItem("userId");
+		console.log("body", bodyObject);
 		const options = {
 			method: "POST",
 			headers: new Headers({
 				Authorization: localStorage.getItem("token"),
 				"Content-Type": "application/json"
 			}),
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+			body: JSON.stringify(bodyObject)
 		};
-		const r = await fetch(`url..`, options);
+		const r = await fetch(`http://localhost:3000/habit/create`, options);
 		const data = await r.json();
+		console.log("data", data);
 		if (data.err) {
 			console.warn(data.err);
 		}

@@ -31,7 +31,7 @@ class Habit {
 			try {
 				let result = await db.query("SELECT * from habits where habit_ID = $1 AND user_ID = $2;", [
 					habit_id,
-					user_ID
+					user_id
 				]);
 				let habit = result.rows.map(r => new Habit(r));
 				resolve(habit);
@@ -47,10 +47,10 @@ class Habit {
 	static create(habitData) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const { habit, frequency, goal, units, user_ID } = habitData;
+				const { habit, frequency, goal, units, user_id } = habitData;
 				let newHabit = await db.query(
 					"INSERT INTO habits (habit, frequency, goal, units, user_ID) VALUES ($1, $2, $3, $4, $5) RETURNING *;",
-					[habit, frequency, goal, units, user_ID]
+					[habit, frequency, goal, units, user_id]
 				);
 				let r = new Habit(newHabit.rows[0]);
 				resolve(r);
