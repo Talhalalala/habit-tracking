@@ -68,6 +68,8 @@ class Habit {
         })
     };
 
+    
+
 }
 
 module.exports = habit;
