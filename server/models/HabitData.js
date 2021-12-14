@@ -21,8 +21,10 @@ class Habit_Data{
                 let freq = await db.query('SELECT frequency FROM habits WHERE habit_ID = $1', [this.habit_id])
                 const { interval_start , interval_end} = habitData;
                 let newHabitData = await db.query('INSERT INTO habit_data (interval_start, interval_end) VALUES (CURRENT_DATE, CURRENT_DATE + integer $1) ) ', [freq])
-            } catch {
-                
+                let resp = new Habit_Data(newHabitData.rows[0])
+                resolve(resp);
+            } catch (err) {
+                reject('Error in creating habit data')
             }
         })
     }
