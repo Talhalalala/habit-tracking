@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const habitController = require('../controllers/habit')
+
+const { create, displayAll, displayAHabit } = require('../controllers/habit')
+const { verifyToken } = require('../middleware/auth')
 
 
 // create habits 
-router.post('/', habitController.create);
-
+router.post('/', verifyToken, habitController.create);
 // displays all users habits 
-router.get('/', habitController)
+router.post('/', verifyToken, habitController.displayAll)
+// display singluar habit
+router.post('/:id', verifyToken, habitController.displayAHabit)
+// delete singular habit
+router.delete('/:id', verifyToken, habitController.destroy)
 
 
 
