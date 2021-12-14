@@ -21,6 +21,7 @@ async function register(req, res) {
 async function login(req, res) {
 	try {
 		const user = await User.findByEmail(req.body.email);
+		console.log(user);
 		if (!user) {
 			throw new Error("No user with this email");
 		}

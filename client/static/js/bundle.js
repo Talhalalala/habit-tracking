@@ -42,7 +42,8 @@ function login(token) {
 	localStorage.setItem("token", token);
 	localStorage.setItem("username", user.username);
 	localStorage.setItem("userEmail", user.email);
-	localStorage.setItem("userId", user.user_ID);
+	localStorage.setItem("userId", user.userId);
+	console.log(user);
 	window.location.hash = "#today";
 }
 
