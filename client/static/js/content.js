@@ -1,9 +1,8 @@
 const { requestLogin, requestRegistration, currentUser } = require("./auth");
 const { getHabits, getInfoAboutHabit, updateHabit, addHabit } = require("./requests");
 
-const main = document.querySelector("main");
-
 function renderLoginForm() {
+	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Email:", attributes: { for: "email", class: "label" } },
 		{ tag: "input", attributes: { type: "email", name: "email", class: "input" } },
@@ -29,6 +28,7 @@ function renderLoginForm() {
 }
 
 function renderRegisterForm() {
+	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Username", attributes: { for: "username", class: "label" } },
 		{ tag: "input", attributes: { type: "text", name: "username", class: "input" } },
@@ -65,6 +65,7 @@ function renderRegisterForm() {
 }
 
 async function renderToday() {
+	const main = document.querySelector("main");
 	let userId = localStorage.getItem("userId");
 	let data = await getHabits(userId);
 	const feed = document.createElement("section");
@@ -183,6 +184,7 @@ function makeHabitInformationForm(habitData) {
 }
 
 function renderNewHabit() {
+	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Habit to track:", attributes: { for: "habit", class: "label" } },
 		{ tag: "input", attributes: { type: "text", name: "habit", class: "input" } },
@@ -214,13 +216,11 @@ function renderNewHabit() {
 			form.appendChild(field);
 		});
 	});
-	form.addEventListener("submit", newHabit);
+	form.addEventListener("submit", async e => {
+		await addHabit(e);
+		window.location.hash = "#habits";
+	});
 	main.appendChild(form);
-}
-
-async function newHabit(e) {
-	addHabit(e);
-	window.location.hash = "#habits";
 }
 
 module.exports = {

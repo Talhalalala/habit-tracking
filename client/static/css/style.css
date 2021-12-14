@@ -109,14 +109,4 @@ nav {
 }
 
 .habit-class {
-	position: static;
-	top: 0;
-	width: 10%;
-	display: block;
-	justify-content: space-evenly;
-	padding: 40px;
-	margin-top: 10px;
-	justify-content: space-evenly;
-	padding: 2px;
-	margin: 15px auto;
 }

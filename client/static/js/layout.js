@@ -72,3 +72,5 @@ function updateContent() {
 }
 
 updateContent();
+
+module.exports = { updateNav, updateMain, createNavLink, updateContent };
