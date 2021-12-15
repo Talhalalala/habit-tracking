@@ -26,12 +26,12 @@ class Habit {
         })
     };
 
-    static OneUserHabit(user_id, habit_id){
+    static OneUserHabit(habit_id){
         return new Promise (async (resolve, reject) => {
             try {
-                let results = await db.query('SELECT * from habits where habit_ID = $1 AND user_ID = $2;',
-                                                [habit_id, user_id]);
-                if (results.length){
+                let results = await db.query('SELECT * from habits where habit_ID = $1;',
+                                                [habit_id]);
+                if (results.rows.length){
                     let habit = new Habit(results.rows[0]);
                     resolve(habit)
                 } else {

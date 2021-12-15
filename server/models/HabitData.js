@@ -31,7 +31,8 @@ class Habit_Data{
     static homepage(user_id) {
         return new Promise(async (res, rej) => {
             try{
-                let results = await db.query('SELECT habits.*, habit_data.* FROM habits INNER JOIN habit_data ON habits.habit_id = habit_data.habit_id WHERE habits.user_id = $1 AND habit_data.habit_date = CURRENT_DATE', [user_id])
+                let results = await db.query('SELECT habits.*, habit_data.habit_data_id, habit_data.habit_date, habit_data.habit_amount, habit_data.habit_achieved from habits LEFT JOIN (SELECT habit_data.* FROM habit_data WHERE habit_data.habit_date = CURRENT_DATE) AS habit_data ON habits.habit_id = habit_data.habit_id WHERE habits.user_id = $1 ORDER BY habit_data.habit_date DESC;', [user_id])
+                // 'SELECT habits.*, habit_data.* FROM habits LEFT JOIN habit_data ON habits.habit_id = habit_data.habit_id WHERE habits.user_id = $1 ORDER BY habit_data.habit_date DESC;'
                 res(results.rows)
             } catch (err) {
                 rej(`Error retrieving homepage habit data: ${err}`)
