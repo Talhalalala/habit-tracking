@@ -1,16 +1,15 @@
 const Habit = require('../models/Habit');
 const User = require("../models/user");
 const Habit_Data = require('../models/HabitData')
-// const Habit = require('../models/Habit')
 
 async function createAndOrUpdate (req, res) {
     let habit_id = req.body.habit_id;
-    let amount = req.body.habit_amount;
+    let amount = parseInt(req.body.habit_amount);
     let habitDataObject = null;
 
     try {
         // Attempt to retrieve
-        habitDataObject = await Habit_Data.readOneHabitData(habit_id, date);
+        habitDataObject = await Habit_Data.readOneHabitData(habit_id);
     } catch (err){
         // Does not exist, so create a new one
         const initialHabitData = {
@@ -19,20 +18,21 @@ async function createAndOrUpdate (req, res) {
             habit_amount: 0,
             habit_achieved: false
         };
+        console.log(initialHabitData);
         try{
             habitDataObject = await Habit_Data.create(initialHabitData);
         } catch (err){
-            res(501);
+            res.status(501);
         }
     }
 
     let newAmount = habitDataObject.amount + amount;
     habitDataObject.update(newAmount);
-    // try{
-    //     let goal = Habit.readGoal
-    // } catch(err){
-        
-    // }
+    try{
+        await Habit_Data.checkGoalAchieved(habit_id)
+    } catch(err){
+        res(501)
+    }
     res(201);
 }
 
@@ -105,9 +105,6 @@ function getCurrentDate(){
     return today
 }
 
-function getYdayDate(){
-    
-}
 
 async function AllTodayHabits(req, res) {
     try {
@@ -121,6 +118,8 @@ async function AllTodayHabits(req, res) {
 async function Homepage(req, res) {
     try {
         const results = await Habit_Data.homepage(req.params.id)
+        const streakSet = results.rows.foreach(habit => await Habit_Data.checkStreak(habit.habit_id))
+        console.log(streakSet);
         res.status(200).json(results)
     } catch(err) {
         res.status(404).json({err})

@@ -18,12 +18,54 @@ class Habit_Data{
         return new Promise(async (res, rej) => {
             try{ 
                 const { habit_id, habit_date, habit_amount, habit_achieved} = habitDataData;
-                let newHabitData = await db.query('INSERT INTO habit_data (habit_id, habit_date, habit_amount, habit_achieve) VALUES ($1, $2, $3, $4) RETURNING *;',
+                let newHabitData = await db.query('INSERT INTO habit_data (habit_id, habit_date, habit_amount, habit_achieved) VALUES ($1, $2, $3, $4) RETURNING *;',
                                                 [ habit_id, habit_date, habit_amount, habit_achieved ]);
                 let r = new Habit_Data(newHabitData.rows[0])
                 resolve(r);
             } catch(err){
                 rej('Error, failed to create new habit data')
+            }
+        })
+    }
+
+    static checkGoalAchieved(habit_id) {
+        return new Promise(async (res, rej) => {
+            try{
+                let results = await db.query('SELECT habits.goal, habit_data.habit_amount, habit_data.habit_data_id FROM habits LEFT JOIN (SELECT habit_data.* FROM habit_data WHERE habit_data.habit_date = CURRENT_DATE) AS habit_data ON habits.habit_id = habit_data.habit_id WHERE habits.habit_id = $1 ORDER BY habit_data.habit_date DESC;', [habit_id])
+                if (results.rows[0].habit_amount >= results.rows[0].goal) {
+                    let update = await db.query('UPDATE habit_data SET habit_achieved = true WHERE habit_data_id = $1 RETURNING *;', [results.rows[0].habit_data_id])
+                    Habit_Data.increaseStreak(habit_id)
+                }
+                res(results.rows)
+            } catch (err) {
+                rej(`Error checking goal achieved: ${err}`)
+            }
+        })
+    }
+
+    static increaseStreak(habit_id) {
+        return new Promise(async (res, rej) => {
+            try{
+                let results = await db.query('UPDATE habits SET streak = streak + 1 WHERE habit_id = $1', [habit_id])
+
+            } catch (err) {
+                rej(`Error increasing streak: ${err}`)
+            }
+        })
+    }
+
+    // CONTINUE WORKING ON THIS
+    static checkStreak(habit_id) {
+        return new Promise(async (res, rej) => {
+            try{
+                let yesterday = await db.query(`SELECT habit_achieved FROM habit_data WHERE habit_id = $1 AND habit_date = (current_date - INTERVAL '1 day')::date`, [habit_id])
+                if (!yesterday)
+                
+                 
+                let results = await db.query('UPDATE habits SET streak = 0 WHERE habit_id = $1', [habit_id])
+
+            } catch (err) {
+                rej(`Error increasing streak: ${err}`)
             }
         })
     }
