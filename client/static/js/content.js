@@ -1,6 +1,7 @@
 const { requestLogin, requestRegistration, currentUser } = require("./auth");
-const { getHabits, getInfoAboutHabit, updateHabit, addHabit } = require("./requests");
+const { getHabits, updateHabit, addHabit, removeHabit } = require("./requests");
 
+// generates the login form
 function renderLoginForm() {
 	const main = document.querySelector("main");
 	const fields = [
@@ -27,6 +28,7 @@ function renderLoginForm() {
 	main.appendChild(form);
 }
 
+// generates the register form
 function renderRegisterForm() {
 	const main = document.querySelector("main");
 	const fields = [
@@ -64,6 +66,7 @@ function renderRegisterForm() {
 	main.appendChild(form);
 }
 
+// shows all the habits a user is tracking and displays a message if they are tracking none
 async function renderToday() {
 	const main = document.querySelector("main");
 	let userId = localStorage.getItem("userId");
@@ -71,11 +74,17 @@ async function renderToday() {
 	const feed = document.createElement("section");
 	feed.id = "feed";
 	main.appendChild(feed);
-	console.log(data);
 	if (data.err) {
 		return;
 	}
-	data.forEach(renderHabits);
+	if (data.length === 0) {
+		const noHabits = document.createElement("h3");
+		noHabits.setAttribute("class", "no-habits");
+		noHabits.textContent = "You aren't tracking any habits yet! Click 'New' to start tracking";
+		feed.appendChild(noHabits);
+	} else {
+		data.forEach(renderHabits);
+	}
 }
 
 function renderHabits(habitData) {
@@ -97,7 +106,7 @@ function renderHabits(habitData) {
 		streak.textContent = "You haven't achieved this goal recently!";
 	}
 
-	const moreinfobutton = createMoreInfoButton(habitData.habit_id);
+	const moreinfobutton = createMoreInfoButton(habitData);
 
 	post.appendChild(habit);
 	post.appendChild(goal);
@@ -106,34 +115,29 @@ function renderHabits(habitData) {
 	feed.appendChild(post);
 }
 
-function createMoreInfoButton(id) {
+function createMoreInfoButton(habitData) {
 	const moreinfobutton = document.createElement("button");
-	moreinfobutton.addEventListener("click", moreInfoAboutHabit);
-	moreinfobutton.setAttribute("class", `${id}`);
+	moreinfobutton.addEventListener("click", e => {
+		e.preventDefault();
+		e.target.remove();
+		makeHabitInformationForm(habitData);
+	});
+	moreinfobutton.setAttribute("class", `${habitData.habit_id}`);
 	moreinfobutton.textContent = "More Info";
 	return moreinfobutton;
 }
 
-async function moreInfoAboutHabit(e) {
+function showlessInfoAboutHabit(e, habitData) {
 	e.preventDefault();
-	const habitId = e.target.classList[0];
-	console.log("habit id", habitId);
-	const userId = localStorage.getItem("userId");
-	const habitData = await getInfoAboutHabit(habitId, userId);
-	console.log("habit data", habitData);
-	// e.target.remove();
-	makeHabitInformationForm(habitData[0]);
-}
-
-function showlessInfoAboutHabit(e) {
-	e.preventDefault();
-	const habitId = e.target.classList[0];
+	const habitId = habitData.habit_id;
 	const postDiv = document.querySelector(`div[name='${habitId}']`);
-	const form = document.querySelector(`form[class='${habitId}']`);
+	const form = document.querySelector(`form[name='${habitId}']`);
 	const infoPara = document.querySelector(`div[name='${habitId}'] > .habit-details`); //" > finds a child class"
-	form.remove(); //removes form
+	if (form) {
+		form.remove(); //removes form
+	}
 	infoPara.remove();
-	const moreInfo = createMoreInfoButton(habitId);
+	const moreInfo = createMoreInfoButton(habitData);
 	postDiv.appendChild(moreInfo);
 	e.target.remove(); //removes button
 }
@@ -148,21 +152,23 @@ function makeHabitInformationForm(habitData) {
 	} else {
 		const habitInfo = document.createElement("p");
 		habitInfo.setAttribute("class", "habit-details");
-		habitInfo.textContent = `You are currently at ${habitData.habit_amount} ${habitData.units}.`;
+		let habitAmount = habitData.habit_amount ? habitData.habit_amount : 0;
+		habitInfo.textContent = `You are currently at ${habitAmount} ${habitData.units} today.`;
 		postDiv.appendChild(habitInfo);
 
 		const fields = [
 			{
 				tag: "label",
-				textContent: `Add ${habitData.units}:addlitre" `,
+				textContent: `Add ${habitData.units}`,
 
 				attributes: { for: "amount" }
 			},
-			{ tag: "input", attributes: { type: "text", name: "amount" } },
+			{ tag: "input", attributes: { type: "text", name: "habit_amount" } },
 			{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
 		];
 		const form = document.createElement("form");
-		form.setAttribute("class", `${habitData.habit_id} addlitre`);
+		form.setAttribute("class", `addlitre`);
+		form.setAttribute("name", `${habitData.habit_id}`);
 		fields.forEach(f => {
 			let field = document.createElement(f.tag);
 			if (f.textContent) {
@@ -173,14 +179,38 @@ function makeHabitInformationForm(habitData) {
 				form.appendChild(field);
 			});
 		});
-		form.addEventListener("submit", updateHabit);
+		form.addEventListener("submit", async e => {
+			try {
+				e.preventDefault();
+				await updateHabit(e, habitData);
+				window.location.reload();
+			} catch (err) {
+				console.warn(err);
+			}
+		});
 		postDiv.appendChild(form);
 	}
 
+	// delete habit button
+	const deleteButton = document.createElement("button");
+	deleteButton.addEventListener("click", async e => {
+		try {
+			e.preventDefault();
+			await removeHabit(habitData.habit_id);
+		} catch (err) {
+			console.warn(err);
+		}
+	});
+	deleteButton.textContent = "Delete habit";
+	postDiv.appendChild(deleteButton);
+
 	//show less button
 	const showlessinfobutton = document.createElement("button");
-	showlessinfobutton.addEventListener("click", showlessInfoAboutHabit);
-	showlessinfobutton.setAttribute("class", `${habitData.habit_id} show-button`);
+	showlessinfobutton.addEventListener("click", e => {
+		e.preventDefault();
+		showlessInfoAboutHabit(e, habitData);
+	});
+	showlessinfobutton.setAttribute("class", `show-button`);
 	showlessinfobutton.textContent = "Less Info";
 
 	postDiv.appendChild(showlessinfobutton);
@@ -220,8 +250,13 @@ function renderNewHabit() {
 		});
 	});
 	form.addEventListener("submit", async e => {
-		await addHabit(e);
-		window.location.hash = "#habits";
+		try {
+			e.preventDefault();
+			await addHabit(e);
+			window.location.hash = "#habits";
+		} catch (err) {
+			console.warn(err);
+		}
 	});
 	main.appendChild(form);
 }

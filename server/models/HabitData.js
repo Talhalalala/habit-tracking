@@ -13,16 +13,32 @@ class Habit_Data {
 		this.achieved = data.habit_achieved;
 	}
 
-	static create(habitDataData) {
+	// static create(habitDataData) {
+	// 	return new Promise(async (res, rej) => {
+	// 		try {
+	// 			const { habit_id, habit_date, habit_amount, habit_achieved } = habitDataData;
+	// 			let newHabitData = await db.query(
+	// 				"INSERT INTO habit_data (habit_id, habit_date, habit_amount, habit_achieved) VALUES ($1, $2, $3, $4) RETURNING *;",
+	// 				[habit_id, habit_date, habit_amount, habit_achieved]
+	// 			);
+	// 			let r = new Habit_Data(newHabitData.rows[0]);
+	// 			resolve(r);
+	// 		} catch (err) {
+	// 			rej("Error, failed to create new habit data");
+	// 		}
+	// 	});
+	// }
+
+	static create(habit_id, habit_amount) {
 		return new Promise(async (res, rej) => {
 			try {
-				const { habit_id, habit_date, habit_amount, habit_achieved } = habitDataData;
+				// const { habit_id, habit_date, habit_amount, habit_achieved } = habitDataData;
 				let newHabitData = await db.query(
-					"INSERT INTO habit_data (habit_id, habit_date, habit_amount, habit_achieve) VALUES ($1, $2, $3, $4) RETURNING *;",
-					[habit_id, habit_date, habit_amount, habit_achieved]
+					"INSERT INTO habit_data (habit_id, habit_date, habit_amount) VALUES ($1, CURRENT_DATE, $2) RETURNING *;",
+					[habit_id, habit_amount]
 				);
 				let r = new Habit_Data(newHabitData.rows[0]);
-				resolve(r);
+				res(r);
 			} catch (err) {
 				rej("Error, failed to create new habit data");
 			}
@@ -69,11 +85,11 @@ class Habit_Data {
 					"SELECT * from habit_data where habit_id = $1 AND habit_date = CURRENT_DATE;",
 					[habit_id]
 				);
-				if (results.rows.length) {
+				if (results.rows.length !== 0) {
 					let event = new Habit_Data(results.rows[0]);
 					res(event);
 				} else {
-					throw "No habit_data found for the given habit_id and date";
+					res([]);
 				}
 			} catch (err) {
 				rej(`Error retrieving one event data: ${err}`);
@@ -82,13 +98,15 @@ class Habit_Data {
 	}
 
 	// Update habitData
-	update(habit_amount) {
+	static update(habit_amount, habit_data_id) {
 		return new Promise(async (res, rej) => {
 			try {
 				let result = await db.query(
-					`UPDATE habit_data SET habit_amount = $1 WHERE habit_data_id = $2 RETURNING *;`,
-					[habit_amount, this.data_id]
+					`UPDATE habit_data SET habit_amount = (habit_amount + $1) WHERE habit_data_id = $2 RETURNING *;`,
+					[habit_amount, habit_data_id]
 				);
+				let habit = new Habit_Data(result.rows[0]);
+				res(habit);
 			} catch (err) {
 				rej(`Error updating one event data: ${err}`);
 			}

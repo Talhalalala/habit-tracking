@@ -29,13 +29,28 @@ async function displayAHabit(req, res) {
 
 async function destroy(req, res) {
 	try {
-		const habit = await Habit.OneUserHabit(req.body.user_id, req.params.id);
-		const res = await habit.destroy;
+		console.log("destroying");
+		const habit = await Habit.OneUserHabit(req.params.id);
+		console.log("habit", habit, habit.destroy);
+		const resp = await habit.destroy();
+		console.log("response", resp);
+		console.log("destroyed");
 		res.status(204).end();
 	} catch (err) {
+		console.log("error");
 		res.status(404).json({ err });
 	}
 }
+
+// async function destroy(req, res) {
+// 	try {
+// 		const book = await Book.findById(parseInt(req.params.id));
+// 		const resp = book.destroy();
+// 		res.status(204).end();
+// 	} catch (err) {
+// 		res.status(404).json({ err });
+// 	}
+// }
 
 // dev function used to show every entry in habits
 async function displayEverything(req, res) {

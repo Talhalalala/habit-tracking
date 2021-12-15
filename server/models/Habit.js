@@ -8,7 +8,6 @@ class Habit {
 		this.habit_id = data.habit_id;
 		this.id = data.user_id;
 		this.habit = data.habit;
-		this.frequency = data.frequency;
 		this.goal = data.goal;
 		this.units = data.units;
 		this.streak = data.streak;
@@ -30,7 +29,7 @@ class Habit {
 	static OneUserHabit(habit_id) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let results = await db.query("SELECT * from habits where habit_ID = $1;", [habit_id]);
+				let results = await db.query("SELECT * from habits where habit_id = $1;", [habit_id]);
 				if (results.rows.length) {
 					let habit = new Habit(results.rows[0]);
 					resolve(habit);
@@ -49,9 +48,9 @@ class Habit {
 	static create(habitData) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const { habit, goal, units, user_ID } = habitData;
+				const { habit, goal, units, user_id } = habitData;
 				let newHabit = await db.query(
-					"INSERT INTO habits (habit, goal, units, user_id) VALUES ($1, $2, $3, $4) RETURNING *;",
+					"INSERT INTO habits (habit, goal, units, user_id, streak) VALUES ($1, $2, $3, $4, 0) RETURNING *;",
 					[habit, goal, units, user_id]
 				);
 				let r = new Habit(newHabit.rows[0]);
@@ -62,14 +61,15 @@ class Habit {
 		});
 	}
 
-	get destroy() {
+	destroy() {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const result = await db.query("DELETE FROM habits WHERE habit_id = $1 RETURNING user_ID", [
-					this.habit_id
-				]);
-				resolve(`Habit ${result.habit} was deleted`);
+				console.log("delete in model");
+				const result = await db.query("DELETE FROM habits WHERE habit_id = $1;", [this.habit_id]);
+				console.log("removed from database");
+				resolve(`Habit was deleted`);
 			} catch (err) {
+				console.log("error in model");
 				reject("Habit could not be deleted");
 			}
 		});
