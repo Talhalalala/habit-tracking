@@ -62,9 +62,8 @@ module.exports = { requestLogin, requestRegistration, login, logout, currentUser
 const { requestLogin, requestRegistration, currentUser } = require("./auth");
 const { getHabits, getInfoAboutHabit, updateHabit, addHabit } = require("./requests");
 
-const main = document.querySelector("main");
-
 function renderLoginForm() {
+	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Email:", attributes: { for: "email", class: "label" } },
 		{ tag: "input", attributes: { type: "email", name: "email", class: "input" } },
@@ -90,6 +89,7 @@ function renderLoginForm() {
 }
 
 function renderRegisterForm() {
+	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Username", attributes: { for: "username", class: "label" } },
 		{ tag: "input", attributes: { type: "text", name: "username", class: "input" } },
@@ -126,6 +126,7 @@ function renderRegisterForm() {
 }
 
 async function renderToday() {
+	const main = document.querySelector("main");
 	let userId = localStorage.getItem("userId");
 	let data = await getHabits(userId);
 	const feed = document.createElement("section");
@@ -152,7 +153,7 @@ function renderHabits(habitData) {
 	habit.setAttribute("class", "habit-class");
 	goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every day`;
 	if (habitData.streak) {
-		streak.textContent = `You've hit your goal ${habitData.streak} times in a row!`;
+		streak.textContent = `You are on a ${habitData.streak} day streak! Keep it up!`;
 	} else {
 		streak.textContent = "You haven't achieved this goal recently!";
 	}
@@ -169,7 +170,7 @@ function renderHabits(habitData) {
 function createMoreInfoButton(id) {
 	const moreinfobutton = document.createElement("button");
 	moreinfobutton.addEventListener("click", moreInfoAboutHabit);
-	moreinfobutton.setAttribute("class", `${id} show_more-button` );
+	moreinfobutton.setAttribute("class", `${id}`);
 	moreinfobutton.textContent = "More Info";
 	return moreinfobutton;
 }
@@ -177,10 +178,11 @@ function createMoreInfoButton(id) {
 async function moreInfoAboutHabit(e) {
 	e.preventDefault();
 	const habitId = e.target.classList[0];
+	console.log("habit id", habitId);
 	const userId = localStorage.getItem("userId");
 	const habitData = await getInfoAboutHabit(habitId, userId);
 	console.log("habit data", habitData);
-	e.target.remove();
+	// e.target.remove();
 	makeHabitInformationForm(habitData[0]);
 }
 
@@ -209,17 +211,19 @@ function makeHabitInformationForm(habitData) {
 		habitInfo.setAttribute("class", "habit-details");
 		habitInfo.textContent = `You are currently at ${habitData.habit_amount} ${habitData.units}.`;
 		postDiv.appendChild(habitInfo);
+
 		const fields = [
 			{
 				tag: "label",
-				textContent: `Add ${habitData.units}:`,
+				textContent: `Add ${habitData.units}:addlitre" `,
+
 				attributes: { for: "amount" }
 			},
 			{ tag: "input", attributes: { type: "text", name: "amount" } },
 			{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
 		];
 		const form = document.createElement("form");
-		form.setAttribute("class", `${habitData.habit_id}`);
+		form.setAttribute("class", `${habitData.habit_id} addlitre`);
 		fields.forEach(f => {
 			let field = document.createElement(f.tag);
 			if (f.textContent) {
@@ -237,13 +241,14 @@ function makeHabitInformationForm(habitData) {
 	//show less button
 	const showlessinfobutton = document.createElement("button");
 	showlessinfobutton.addEventListener("click", showlessInfoAboutHabit);
-	showlessinfobutton.setAttribute("class", `${habitData.habit_id} show_less-button`);
+	showlessinfobutton.setAttribute("class", `${habitData.habit_id} show-button`);
 	showlessinfobutton.textContent = "Less Info";
 
 	postDiv.appendChild(showlessinfobutton);
 }
 
 function renderNewHabit() {
+	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Habit to track:", attributes: { for: "habit", class: "label" } },
 		{ tag: "input", attributes: { type: "text", name: "habit", class: "input" } },
@@ -275,13 +280,11 @@ function renderNewHabit() {
 			form.appendChild(field);
 		});
 	});
-	form.addEventListener("submit", newHabit);
+	form.addEventListener("submit", async e => {
+		await addHabit(e);
+		window.location.hash = "#habits";
+	});
 	main.appendChild(form);
-}
-
-async function newHabit(e) {
-	addHabit(e);
-	window.location.hash = "#habits";
 }
 
 module.exports = {
@@ -369,24 +372,27 @@ function updateContent() {
 
 updateContent();
 
+module.exports = { updateNav, updateMain, createNavLink, updateContent };
+
 },{"./auth":1,"./content":2}],4:[function(require,module,exports){
 const { logout } = require("./auth");
 
 async function getHabits(id) {
 	try {
 		const options = {
-			method: "POST",
+			// method: "POST",
 			headers: new Headers({
-				Authorization: localStorage.getItem("token"),
-				"Content-Type": "application/json"
-			}),
-			body: JSON.stringify({ user_id: id })
+				Authorization: localStorage.getItem("token")
+				// "Content-Type": "application/json"
+			})
+			// body: JSON.stringify({ user_id: id })
 		};
-		const response = await fetch("http://localhost:3000/habit", options); // get correct route to get names of all habits
+		const response = await fetch(`http://localhost:3000/habitdata/homepage/${id}`, options); // get correct route to get names of all habits
 		const data = await response.json();
+		console.log("homepage data returned front end", data);
 		if (data.err) {
 			console.warn(data.err);
-			logout();
+			// logout();
 		}
 		return data;
 	} catch (err) {
@@ -395,25 +401,26 @@ async function getHabits(id) {
 }
 
 async function getInfoAboutHabit(habitId, userId) {
-	try {
-		const options = {
-			method: "POST",
-			headers: new Headers({
-				Authorization: localStorage.getItem("token"),
-				"Content-Type": "application/json"
-			}),
-			body: JSON.stringify({ user_id: userId })
-		};
-		const response = await fetch(`http://localhost:3000/habit/${habitId}`, options); // get correct route to get details of the habit
-		const data = await response.json();
-		if (data.err) {
-			console.warn(data.err);
-			logout();
-		}
-		return data;
-	} catch (err) {
-		console.warn(err);
-	}
+	// try {
+	// 	const options = {
+	// 		// method: "POST",
+	// 		headers: new Headers({
+	// 			Authorization: localStorage.getItem("token")
+	// 			// "Content-Type": "application/json"
+	// 		})
+	// 		// body: JSON.stringify({ user_id: userId })
+	// 	};
+	// 	const response = await fetch(`http://localhost:3000/habitdata/homepage/${habitId}`, options); // get correct route to get details of the habit
+	// 	const data = await response.json();
+	// 	console.log("returned to front end from fetch", data);
+	// 	if (data.err) {
+	// 		console.warn(data.err);
+	// 		// logout();
+	// 	}
+	// 	return data;
+	// } catch (err) {
+	// 	console.warn(err);
+	// }
 }
 
 async function updateHabit(e) {

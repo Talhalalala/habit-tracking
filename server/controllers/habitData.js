@@ -108,7 +108,9 @@ async function AllTodayHabits(req, res) {
 
 async function Homepage(req, res) {
 	try {
+		console.log("homepage, habit id", req.params.id);
 		const results = await Habit_Data.homepage(req.params.id);
+		console.log("results of request to server", results);
 		res.status(200).json(results);
 	} catch (err) {
 		res.status(404).json({ err });

@@ -4,7 +4,7 @@ const User = require("./User");
 
 class Habit {
 	constructor(data) {
-		this.habit_id = data.habit_data_id;
+		this.habit_id = data.habit_id;
 		this.id = data.user_id;
 		this.habit = data.habit;
 		this.frequency = data.frequency;
@@ -17,7 +17,7 @@ class Habit {
 	static allUserHabits(user_id) {
 		return new Promise(async (res, rej) => {
 			try {
-				let results = await db.query(`SELECT * from habits where user_ID = $1;`, [user_id]);
+				let results = await db.query(`SELECT * from habits where user_id = $1;`, [user_id]);
 				let habits = results.rows.map(r => new Habit(r));
 				res(habits);
 			} catch (err) {
@@ -29,7 +29,7 @@ class Habit {
 	static OneUserHabit(user_id, habit_id) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let results = await db.query("SELECT * from habits where habit_ID = $1 AND user_ID = $2;", [
+				let results = await db.query("SELECT * from habits where habit_id = $1 AND user_id = $2;", [
 					habit_id,
 					user_id
 				]);
@@ -53,7 +53,7 @@ class Habit {
 			try {
 				const { habit, goal, units, user_ID } = habitData;
 				let newHabit = await db.query(
-					"INSERT INTO habits (habit, goal, units, user_ID) VALUES ($1, $2, $3, $4) RETURNING *;",
+					"INSERT INTO habits (habit, goal, units, user_id) VALUES ($1, $2, $3, $4) RETURNING *;",
 					[habit, goal, units, user_id]
 				);
 				let r = new Habit(newHabit.rows[0]);

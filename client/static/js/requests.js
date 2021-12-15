@@ -3,18 +3,19 @@ const { logout } = require("./auth");
 async function getHabits(id) {
 	try {
 		const options = {
-			method: "POST",
+			// method: "POST",
 			headers: new Headers({
-				Authorization: localStorage.getItem("token"),
-				"Content-Type": "application/json"
-			}),
-			body: JSON.stringify({ user_id: id })
+				Authorization: localStorage.getItem("token")
+				// "Content-Type": "application/json"
+			})
+			// body: JSON.stringify({ user_id: id })
 		};
-		const response = await fetch("http://localhost:4000/habit", options); // get correct route to get names of all habits
+		const response = await fetch(`http://localhost:3000/habitdata/homepage/${id}`, options); // get correct route to get names of all habits
 		const data = await response.json();
+		console.log("homepage data returned front end", data);
 		if (data.err) {
 			console.warn(data.err);
-			logout();
+			// logout();
 		}
 		return data;
 	} catch (err) {
@@ -23,25 +24,26 @@ async function getHabits(id) {
 }
 
 async function getInfoAboutHabit(habitId, userId) {
-	try {
-		const options = {
-			method: "POST",
-			headers: new Headers({
-				Authorization: localStorage.getItem("token"),
-				"Content-Type": "application/json"
-			}),
-			body: JSON.stringify({ user_id: userId })
-		};
-		const response = await fetch(`http://localhost:4000/habit/${habitId}`, options); // get correct route to get details of the habit
-		const data = await response.json();
-		if (data.err) {
-			console.warn(data.err);
-			logout();
-		}
-		return data;
-	} catch (err) {
-		console.warn(err);
-	}
+	// try {
+	// 	const options = {
+	// 		// method: "POST",
+	// 		headers: new Headers({
+	// 			Authorization: localStorage.getItem("token")
+	// 			// "Content-Type": "application/json"
+	// 		})
+	// 		// body: JSON.stringify({ user_id: userId })
+	// 	};
+	// 	const response = await fetch(`http://localhost:3000/habitdata/homepage/${habitId}`, options); // get correct route to get details of the habit
+	// 	const data = await response.json();
+	// 	console.log("returned to front end from fetch", data);
+	// 	if (data.err) {
+	// 		console.warn(data.err);
+	// 		// logout();
+	// 	}
+	// 	return data;
+	// } catch (err) {
+	// 	console.warn(err);
+	// }
 }
 
 async function updateHabit(e) {
@@ -84,7 +86,7 @@ async function addHabit(e) {
 			}),
 			body: JSON.stringify(bodyObject)
 		};
-		const r = await fetch(`http://localhost:4000/habit/create`, options);
+		const r = await fetch(`http://localhost:3000/habit/create`, options);
 		const data = await r.json();
 		console.log("data", data);
 		if (data.err) {
