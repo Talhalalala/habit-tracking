@@ -9,11 +9,12 @@ async function createAndOrUpdate(req, res) {
 		let exists = await Habit_Data.readOneHabitData(requestHabitId);
 		if (exists.length !== 0) {
 			let update = await Habit_Data.update(requestAmount, exists.data_id);
-			res.status(201).json(update);
 		} else {
 			let create = await Habit_Data.create(requestHabitId, requestAmount);
-			res.status(201).json(create);
 		}
+		Habit_Data.checkGoalAchieved(requestHabitId);
+
+		res.status(201).json(create);
 	} catch (err) {
 		res.status(501);
 	}
@@ -63,8 +64,10 @@ async function AllTodayHabits(req, res) {
 async function Homepage(req, res) {
 	try {
 		const results = await Habit_Data.homepage(req.params.id);
-		const streakSet = results.rows.foreach(habit => await Habit_Data.checkStreak(habit.habit_id));
-		console.log(streakSet);
+		// const streakSet = results.rows.forEach(
+		// 	async habit => await Habit_Data.checkStreak(habit.habit_id)
+		// );
+		// console.log(streakSet);
 		res.status(200).json(results);
 	} catch (err) {
 		res.status(404).json({ err });

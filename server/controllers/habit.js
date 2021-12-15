@@ -29,15 +29,9 @@ async function displayAHabit(req, res) {
 
 async function destroy(req, res) {
 	try {
-		console.log("destroying");
-		// const habit = await Habit.OneUserHabit(parseInt(req.params.id));
-		// console.log("habit", habit, habit.destroy);
 		const resp = await Habit.destroy(req.params.id);
-		console.log("response", resp);
-		console.log("destroyed");
 		res.status(204).end();
 	} catch (err) {
-		console.log("error");
 		res.status(404).json({ err });
 	}
 }
