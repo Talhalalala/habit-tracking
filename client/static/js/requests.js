@@ -10,7 +10,7 @@ async function getHabits(id) {
 			}),
 			body: JSON.stringify({ user_id: id })
 		};
-		const response = await fetch("http://localhost:3000/habit", options); // get correct route to get names of all habits
+		const response = await fetch("http://localhost:4000/habit", options); // get correct route to get names of all habits
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -32,7 +32,7 @@ async function getInfoAboutHabit(habitId, userId) {
 			}),
 			body: JSON.stringify({ user_id: userId })
 		};
-		const response = await fetch(`http://localhost:3000/habit/${habitId}`, options); // get correct route to get details of the habit
+		const response = await fetch(`http://localhost:4000/habit/${habitId}`, options); // get correct route to get details of the habit
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -84,7 +84,7 @@ async function addHabit(e) {
 			}),
 			body: JSON.stringify(bodyObject)
 		};
-		const r = await fetch(`http://localhost:3000/habit/create`, options);
+		const r = await fetch(`http://localhost:4000/habit/create`, options);
 		const data = await r.json();
 		console.log("data", data);
 		if (data.err) {

@@ -169,7 +169,7 @@ function renderHabits(habitData) {
 function createMoreInfoButton(id) {
 	const moreinfobutton = document.createElement("button");
 	moreinfobutton.addEventListener("click", moreInfoAboutHabit);
-	moreinfobutton.setAttribute("class", `${id}`);
+	moreinfobutton.setAttribute("class", `${id} show_more-button` );
 	moreinfobutton.textContent = "More Info";
 	return moreinfobutton;
 }
@@ -237,7 +237,7 @@ function makeHabitInformationForm(habitData) {
 	//show less button
 	const showlessinfobutton = document.createElement("button");
 	showlessinfobutton.addEventListener("click", showlessInfoAboutHabit);
-	showlessinfobutton.setAttribute("class", `${habitData.habit_id} show-button`);
+	showlessinfobutton.setAttribute("class", `${habitData.habit_id} show_less-button`);
 	showlessinfobutton.textContent = "Less Info";
 
 	postDiv.appendChild(showlessinfobutton);

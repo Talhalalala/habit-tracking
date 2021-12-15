@@ -148,17 +148,19 @@ function makeHabitInformationForm(habitData) {
 		habitInfo.setAttribute("class", "habit-details");
 		habitInfo.textContent = `You are currently at ${habitData.habit_amount} ${habitData.units}.`;
 		postDiv.appendChild(habitInfo);
+		
 		const fields = [
 			{
 				tag: "label",
-				textContent: `Add ${habitData.units}:`,
+				textContent:`Add ${habitData.units}:addlitre" ` ,
+				
 				attributes: { for: "amount" }
 			},
-			{ tag: "input", attributes: { type: "text", name: "amount" } },
+			{ tag: "input", attributes: { type: "text", name: "amount"} },
 			{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
 		];
 		const form = document.createElement("form");
-		form.setAttribute("class", `${habitData.habit_id}`);
+		form.setAttribute("class", `${habitData.habit_id} addlitre`);
 		fields.forEach(f => {
 			let field = document.createElement(f.tag);
 			if (f.textContent) {
