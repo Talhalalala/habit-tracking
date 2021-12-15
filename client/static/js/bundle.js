@@ -422,7 +422,6 @@ async function getHabits(id) {
 		};
 		const response = await fetch(`http://localhost:3000/habitdata/homepage/${id}`, options); // get correct route to get names of all habits
 		const data = await response.json();
-		console.log("homepage data returned front end", data);
 		if (data.err) {
 			console.warn(data.err);
 			logout();
@@ -437,7 +436,6 @@ async function updateHabit(e, habitData) {
 	try {
 		const bodyObject = Object.fromEntries(new FormData(e.target));
 		bodyObject["habit_id"] = habitData.habit_id;
-		console.log("body sent with update habit", bodyObject);
 		// const userId = localStorage.getItem("userId");
 		const options = {
 			method: "POST",
@@ -452,7 +450,6 @@ async function updateHabit(e, habitData) {
 		if (data.err) {
 			console.warn(data.err);
 		}
-		console.log("updating habit data", data);
 		return data;
 	} catch (err) {
 		console.warn(err);
@@ -484,7 +481,6 @@ async function addHabit(e) {
 
 async function removeHabit(id) {
 	try {
-		console.log("requesting delete");
 		const options = {
 			method: "DELETE",
 			headers: new Headers({
