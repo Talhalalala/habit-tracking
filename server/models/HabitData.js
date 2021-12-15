@@ -78,10 +78,17 @@ class Habit_Data {
 		return new Promise(async (res, rej) => {
 			try {
 				let yesterday = await db.query(
-					`SELECT habit_achieved FROM habit_data WHERE habit_id = $1 AND habit_date = (current_date - INTERVAL '1 day')::date`,
+					`SELECT habit_achieved FROM habit_data WHERE habit_id = $1 AND habit_date = (current_date - INTERVAL '1 day')::date;`,
 					[habit_id]
 				);
-				if (!yesterday.length) {
+				let today = await db.query(
+					"SELECT habit_achieved FROM habit_data WHERE habit_id = $1 AND habit_date = CURRENT_DATE;",
+					[habit_id]
+				);
+				if (
+					(!yesterday.rows.length || yesterday.rows[0].habit_achieved === false) &&
+					!today.rows.length
+				) {
 					let results = await db.query("UPDATE habits SET streak = 0 WHERE habit_id = $1", [
 						habit_id
 					]);
@@ -96,7 +103,8 @@ class Habit_Data {
 		return new Promise(async (res, rej) => {
 			try {
 				let results = await db.query(
-					`SELECT habits.*, habit_data.habit_data_id, habit_data.habit_date, habit_data.habit_amount, habit_data.habit_achieved FROM habits
+					`SELECT habits.*, habit_data.habit_data_id, habit_data.habit_date, habit_data.habit_amount, habit_data.habit_achieved 
+                    FROM habits
                     LEFT JOIN
                     (
                         SELECT habit_data.*
@@ -109,7 +117,6 @@ class Habit_Data {
                     ORDER BY habits.habit;`,
 					[user_id]
 				);
-				// 'SELECT habits.*, habit_data.* FROM habits LEFT JOIN habit_data ON habits.habit_id = habit_data.habit_id WHERE habits.user_id = $1 ORDER BY habit_data.habit_date DESC;'
 				res(results.rows);
 			} catch (err) {
 				rej(`Error retrieving homepage habit data: ${err}`);

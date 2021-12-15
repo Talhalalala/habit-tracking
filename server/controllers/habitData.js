@@ -63,11 +63,9 @@ async function AllTodayHabits(req, res) {
 
 async function Homepage(req, res) {
 	try {
-		const results = await Habit_Data.homepage(req.params.id);
-		// const streakSet = results.rows.forEach(
-		// 	async habit => await Habit_Data.checkStreak(habit.habit_id)
-		// );
-		// console.log(streakSet);
+		let results = await Habit_Data.homepage(req.params.id);
+		const streakSet = results.forEach(async habit => await Habit_Data.checkStreak(habit.habit_id));
+		results = await Habit_Data.homepage(req.params.id);
 		res.status(200).json(results);
 	} catch (err) {
 		res.status(404).json({ err });
