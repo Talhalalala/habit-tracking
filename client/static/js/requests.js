@@ -1,12 +1,15 @@
 const { logout } = require("./auth");
 
-async function getHabits(username) {
+async function getHabits(id) {
 	try {
 		const options = {
-			headers: new Headers({ Authorization: localStorage.getItem("token") })
+			headers: new Headers({
+				Authorization: localStorage.getItem("token")
+			})
 		};
-		const response = await fetch("http://localhost:3000/URL", options); // get correct route to get names of all habits
+		const response = await fetch(`http://localhost:3000/habitdata/homepage/${id}`, options); // get correct route to get names of all habits
 		const data = await response.json();
+		console.log("homepage data returned front end", data);
 		if (data.err) {
 			console.warn(data.err);
 			logout();
@@ -17,41 +20,26 @@ async function getHabits(username) {
 	}
 }
 
-async function getInfoAboutHabit(id) {
+async function updateHabit(e, habitData) {
 	try {
-		const options = {
-			headers: new Headers({ Authorization: localStorage.getItem("token") })
-		};
-		const response = await fetch("http://localhost:3000/URL", options); // get correct route to get details of the habit
-		const data = await response.json();
-		if (data.err) {
-			console.warn(data.err);
-			logout();
-		}
-	} catch (err) {
-		console.warn(err);
-	}
-}
-
-async function updateHabit(e) {
-	try {
-		e.preventDefault();
-		const habitId = e.target.id;
-		const value = e.target.value;
-		const userId = localStorage.getItem("userId");
+		const bodyObject = Object.fromEntries(new FormData(e.target));
+		bodyObject["habit_id"] = habitData.habit_id;
+		console.log("body sent with update habit", bodyObject);
+		// const userId = localStorage.getItem("userId");
 		const options = {
 			method: "POST",
 			headers: new Headers({
 				Authorization: localStorage.getItem("token"),
 				"Content-Type": "application/json"
 			}),
-			body: JSON.stringify({ user_ID: userId, habit_ID: habitId, amount: value })
+			body: JSON.stringify(bodyObject)
 		};
-		const response = await fetch("URL", options); //get route for updating the habit
+		const response = await fetch("http://localhost:3000/habitdata/", options); //get route for updating the habit
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
 		}
+		console.log("updating habit data", data);
 		return data;
 	} catch (err) {
 		console.warn(err);
@@ -60,16 +48,17 @@ async function updateHabit(e) {
 
 async function addHabit(e) {
 	try {
-		e.preventDefault();
+		const bodyObject = Object.fromEntries(new FormData(e.target));
+		bodyObject["user_id"] = localStorage.getItem("userId");
 		const options = {
 			method: "POST",
 			headers: new Headers({
 				Authorization: localStorage.getItem("token"),
 				"Content-Type": "application/json"
 			}),
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+			body: JSON.stringify(bodyObject)
 		};
-		const r = await fetch(`url..`, options);
+		const r = await fetch(`http://localhost:3000/habit/create`, options);
 		const data = await r.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -80,4 +69,20 @@ async function addHabit(e) {
 	}
 }
 
-module.exports = { getHabits, updateHabit, getInfoAboutHabit, addHabit };
+async function removeHabit(id) {
+	try {
+		console.log("requesting delete");
+		const options = {
+			method: "DELETE",
+			headers: new Headers({
+				Authorization: localStorage.getItem("token"),
+				"Content-Type": "application/json"
+			})
+		};
+		await fetch(`http://localhost:3000/habit/${id}`, options);
+	} catch (err) {
+		console.warn(err);
+	}
+}
+
+module.exports = { getHabits, updateHabit, addHabit, removeHabit };
