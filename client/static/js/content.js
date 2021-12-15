@@ -197,6 +197,7 @@ function makeHabitInformationForm(habitData) {
 		try {
 			e.preventDefault();
 			await removeHabit(habitData.habit_id);
+			window.location.reload();
 		} catch (err) {
 			console.warn(err);
 		}

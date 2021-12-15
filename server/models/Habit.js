@@ -61,19 +61,32 @@ class Habit {
 		});
 	}
 
-	destroy() {
-		return new Promise(async (resolve, reject) => {
+	static destroy(habit_id) {
+		return new Promise(async (res, rej) => {
 			try {
-				console.log("delete in model");
-				const result = await db.query("DELETE FROM habits WHERE habit_id = $1;", [this.habit_id]);
-				console.log("removed from database");
-				resolve(`Habit was deleted`);
+				const del = await db.query("DELETE FROM habits WHERE habit_id = $1;", [habit_id]);
+				res("Habit has been deleted");
 			} catch (err) {
-				console.log("error in model");
-				reject("Habit could not be deleted");
+				rej("Habit could not be deleted");
 			}
 		});
 	}
+
+	// destroy() {
+	// 	console.log("does the model function run?");
+	// 	return new Promise(async (resolve, reject) => {
+	// 		console.log("I am being run in the model!");
+	// 		try {
+	// 			console.log("delete in model");
+	// 			const result = await db.query("DELETE FROM habits WHERE habit_id = $1;", [this.habit_id]);
+	// 			console.log("removed from database");
+	// 			resolve(`Habit was deleted`);
+	// 		} catch (err) {
+	// 			console.log("error in model");
+	// 			reject("Habit could not be deleted");
+	// 		}
+	// 	});
+	// }
 
 	static get everything() {
 		return new Promise(async (res, rej) => {
