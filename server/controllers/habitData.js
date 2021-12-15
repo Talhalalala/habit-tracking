@@ -1,6 +1,7 @@
 const Habit = require("../models/Habit");
 const User = require("../models/user");
 const Habit_Data = require("../models/HabitData");
+// const Habit = require('../models/Habit')
 
 async function createAndOrUpdate(req, res) {
 	let habit_id = req.body.habit_id;
@@ -27,6 +28,11 @@ async function createAndOrUpdate(req, res) {
 
 	let newAmount = habitDataObject.amount + amount;
 	habitDataObject.update(newAmount);
+	// try{
+	//     let goal = Habit.readGoal
+	// } catch(err){
+
+	// }
 	res(201);
 }
 
@@ -96,6 +102,8 @@ function getCurrentDate() {
 	let today = new Date().toISOString().slice(0, 10);
 	return today;
 }
+
+function getYdayDate() {}
 
 async function AllTodayHabits(req, res) {
 	try {

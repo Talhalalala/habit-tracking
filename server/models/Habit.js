@@ -1,4 +1,5 @@
 const db = require("../db_config/config");
+const Habit_Data = require("./HabitData");
 
 const User = require("./User");
 
@@ -26,14 +27,11 @@ class Habit {
 		});
 	}
 
-	static OneUserHabit(user_id, habit_id) {
+	static OneUserHabit(habit_id) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let results = await db.query("SELECT * from habits where habit_id = $1 AND user_id = $2;", [
-					habit_id,
-					user_id
-				]);
-				if (results.length) {
+				let results = await db.query("SELECT * from habits where habit_ID = $1;", [habit_id]);
+				if (results.rows.length) {
 					let habit = new Habit(results.rows[0]);
 					resolve(habit);
 				} else {
@@ -89,17 +87,26 @@ class Habit {
 		});
 	}
 
-	static get everything() {
+	static readCurrentHabitStreak(user_id, habit_id) {
 		return new Promise(async (res, rej) => {
 			try {
-				let result = await db.query(`SELECT * from habits;`);
-				let habits = result.rows.map(r => new Habit(r));
-				res(habits);
+				let results = await db.query(
+					"SELECT streak FROM habits WHERE user_id = $1 AND habit_id = $2;",
+					[user_id, habit_id]
+				);
+				if (results.rows.length) {
+					let event = new Habit_Data(results.rows[0]);
+					res(event);
+				} else {
+					throw "No given streak for this user_id and habit_id";
+				}
 			} catch (err) {
-				rej(`Error retrieving habits: ${err}`);
+				rej(`Error retrieving streak data for this habit_id: ${err}`);
 			}
 		});
 	}
+
+	// static readHabitGoal
 
 	get destroy() {
 		return new Promise(async (resolve, reject) => {

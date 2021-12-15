@@ -15,7 +15,7 @@ router.post("/create", verifyToken, create);
 // displays all users habits
 router.post("/", verifyToken, displayAll);
 // display singluar habit
-router.post("/:id", verifyToken, displayAHabit);
+router.get("/:id", displayAHabit);
 // delete singular habit
 router.delete("/:id", verifyToken, destroy);
 // display all habits in habits table
