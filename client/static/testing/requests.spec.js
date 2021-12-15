@@ -22,14 +22,14 @@ describe("requests", () => {
 
 	describe("getHabits", () => {
 		it("makes a fetch request", () => {
-			app.getHabits("testuser");
+			app.getHabits(1);
 			expect(fetch).toHaveBeenCalledTimes(1);
 		});
 	});
 
 	describe("getInfoAboutHabit", () => {
 		it("makes a fetch request", () => {
-			app.getInfoAboutHabit(1);
+			app.getInfoAboutHabit(1, 1);
 			expect(fetch).toHaveBeenCalledTimes(1);
 		});
 	});

@@ -158,6 +158,7 @@ nav {
 	
 }
 
+<<<<<<< HEAD
 .streak-button {
 	position: static;
 	top: 0;
@@ -189,5 +190,8 @@ nav {
 	color: rgba(58, 58, 58, 0.87);
 	box-shadow: 0px 0px 10px rgba(66, 64, 64, 0.322);
 
+=======
+.habit-class {
+>>>>>>> 35810df82e76aa134e110a09b419f6d05c22cf3f
 }
 
