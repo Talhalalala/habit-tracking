@@ -42,9 +42,6 @@ class Habit {
 		});
 	}
 
-	// function to allow users to add new habits
-	// remind frontend to send user_ID
-	// looks good
 	static create(habitData) {
 		return new Promise(async (resolve, reject) => {
 			try {
@@ -83,27 +80,6 @@ class Habit {
 			}
 		});
 	}
-
-	static readCurrentHabitStreak(user_id, habit_id) {
-		return new Promise(async (res, rej) => {
-			try {
-				let results = await db.query(
-					"SELECT streak FROM habits WHERE user_id = $1 AND habit_id = $2;",
-					[user_id, habit_id]
-				);
-				if (results.rows.length) {
-					let event = new Habit_Data(results.rows[0]);
-					res(event);
-				} else {
-					throw "No given streak for this user_id and habit_id";
-				}
-			} catch (err) {
-				rej(`Error retrieving streak data for this habit_id: ${err}`);
-			}
-		});
-	}
-
-	// static readHabitGoal
 
 	get destroy() {
 		return new Promise(async (resolve, reject) => {

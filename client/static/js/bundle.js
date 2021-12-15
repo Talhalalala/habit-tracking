@@ -21,17 +21,26 @@ async function requestLogin(e) {
 async function requestRegistration(e) {
 	e.preventDefault();
 	try {
-		const options = {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
-		};
-		const r = await fetch(`http://localhost:3000/auth/register`, options);
-		const data = await r.json();
-		if (data.err) {
-			throw Error(data.err);
+		const password = document.querySelector("[name='password']").value;
+		const passwordConfirm = document.querySelector("[name='passwordConfirmation']").value;
+		if (password === passwordConfirm) {
+			const options = {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+			};
+			const r = await fetch(`http://localhost:3000/auth/register`, options);
+			const data = await r.json();
+			if (data.err) {
+				throw Error(data.err);
+			}
+			requestLogin(e);
+		} else {
+			const main = document.querySelector("main");
+			const message = document.createElement("p");
+			message.textContent = "Please make sure the password and password comfirmation match";
+			main.appendChild(message);
 		}
-		requestLogin(e);
 	} catch (err) {
 		console.warn(err);
 	}
@@ -60,7 +69,7 @@ module.exports = { requestLogin, requestRegistration, login, logout, currentUser
 
 },{}],2:[function(require,module,exports){
 const { requestLogin, requestRegistration, currentUser } = require("./auth");
-const { getHabits, updateHabit, addHabit, removeHabit } = require("./requests");
+const { getHabits, updateHabit, addHabit, removeHabit, getHistory } = require("./requests");
 
 // generates the login form
 function renderLoginForm() {
@@ -194,9 +203,11 @@ function showlessInfoAboutHabit(e, habitData) {
 	const postDiv = document.querySelector(`div[name='${habitId}']`);
 	const form = document.querySelector(`form[name='${habitId}']`);
 	const infoPara = document.querySelector(`div[name='${habitId}'] > .habit-details`); //" > finds a child class"
+	const deleteButton = document.querySelector(`div[name='${habitId}'] > .delete-habit`);
 	if (form) {
 		form.remove(); //removes form
 	}
+	deleteButton.remove();
 	infoPara.remove();
 	const moreInfo = createMoreInfoButton(habitData);
 	postDiv.appendChild(moreInfo);
@@ -220,7 +231,7 @@ function makeHabitInformationForm(habitData) {
 		const fields = [
 			{
 				tag: "label",
-				textContent: `Add ${habitData.units}`,
+				textContent: `Add ${habitData.units.toLowerCase()}`,
 
 				attributes: { for: "amount" }
 			},
@@ -243,8 +254,8 @@ function makeHabitInformationForm(habitData) {
 		form.addEventListener("submit", async e => {
 			try {
 				e.preventDefault();
-				await updateHabit(e, habitData);
 				window.location.reload();
+				await updateHabit(e, habitData);
 			} catch (err) {
 				console.warn(err);
 			}
@@ -252,8 +263,13 @@ function makeHabitInformationForm(habitData) {
 		postDiv.appendChild(form);
 	}
 
+	// habit history button
+	const historyButton = createHabitHistoryButton(habitData);
+	postDiv.append(historyButton);
+
 	// delete habit button
 	const deleteButton = document.createElement("button");
+	deleteButton.setAttribute("class", "delete-habit");
 	deleteButton.addEventListener("click", async e => {
 		try {
 			e.preventDefault();
@@ -276,6 +292,56 @@ function makeHabitInformationForm(habitData) {
 	showlessinfobutton.textContent = "Less Info";
 
 	postDiv.appendChild(showlessinfobutton);
+}
+
+function createHabitHistoryButton(habitData) {
+	const historyButton = document.createElement("button");
+	historyButton.setAttribute("class", "habit-history");
+	historyButton.addEventListener("click", async e => {
+		try {
+			e.preventDefault();
+			e.target.remove();
+			await showHistory(habitData);
+		} catch (err) {
+			console.warn(err);
+		}
+	});
+	historyButton.textContent = "Show habit history";
+	return historyButton;
+}
+
+async function showHistory(habitData) {
+	const postDiv = document.querySelector(`div[name='${habitData.habit_id}']`);
+	const deleteButton = document.querySelector(`div[name='${habitData.habit_id}'] > .delete-habit`);
+	const history = await getHistory(habitData.habit_id);
+	const div = document.createElement("div");
+	div.setAttribute("class", "history-div");
+	history.forEach(data => {
+		const histEl = createHistoryElement(data, habitData);
+		div.appendChild(histEl);
+	});
+	const hideHistoryButton = document.createElement("button");
+	hideHistoryButton.textContent = "Hide habit history";
+	hideHistoryButton.addEventListener("click", e => {
+		e.preventDefault();
+		div.remove();
+		const historyButton = createHabitHistoryButton(habitData);
+		postDiv.insertBefore(historyButton, deleteButton);
+	});
+	div.appendChild(hideHistoryButton);
+	postDiv.insertBefore(div, deleteButton);
+}
+
+function createHistoryElement(data, habitData) {
+	const habitDiv = document.createElement("div");
+	habitDiv.classList.add(`achieved-${data.achieved}`); // class will be 'achieved-false' or 'achieved-true'
+	const datePara = document.createElement("p");
+	datePara.textContent = `${data.date.split("T")[0]}:`;
+	const amountPara = document.createElement("p");
+	amountPara.textContent = `${data.amount} ${habitData.units.toLowerCase()}`;
+	habitDiv.appendChild(datePara);
+	habitDiv.appendChild(amountPara);
+	return habitDiv;
 }
 
 function renderNewHabit() {
@@ -494,6 +560,25 @@ async function removeHabit(id) {
 	}
 }
 
-module.exports = { getHabits, updateHabit, addHabit, removeHabit };
+async function getHistory(id) {
+	try {
+		const options = {
+			headers: new Headers({
+				Authorization: localStorage.getItem("token")
+			})
+		};
+		const response = await fetch(`http://localhost:3000/habitdata/all/${id}`, options); // get correct route to get names of all habits
+		const data = await response.json();
+		if (data.err) {
+			console.warn(data.err);
+			logout();
+		}
+		return data;
+	} catch (err) {
+		console.warn(err);
+	}
+}
+
+module.exports = { getHabits, updateHabit, addHabit, removeHabit, getHistory };
 
 },{"./auth":1}]},{},[1,2,3,4]);

@@ -81,4 +81,23 @@ async function removeHabit(id) {
 	}
 }
 
-module.exports = { getHabits, updateHabit, addHabit, removeHabit };
+async function getHistory(id) {
+	try {
+		const options = {
+			headers: new Headers({
+				Authorization: localStorage.getItem("token")
+			})
+		};
+		const response = await fetch(`http://localhost:3000/habitdata/all/${id}`, options); // get correct route to get names of all habits
+		const data = await response.json();
+		if (data.err) {
+			console.warn(data.err);
+			logout();
+		}
+		return data;
+	} catch (err) {
+		console.warn(err);
+	}
+}
+
+module.exports = { getHabits, updateHabit, addHabit, removeHabit, getHistory };

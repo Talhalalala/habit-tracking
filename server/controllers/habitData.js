@@ -13,7 +13,6 @@ async function createAndOrUpdate(req, res) {
 			let create = await Habit_Data.create(requestHabitId, requestAmount);
 		}
 		Habit_Data.checkGoalAchieved(requestHabitId);
-
 		res.status(201).json(create);
 	} catch (err) {
 		res.status(501);
@@ -52,15 +51,6 @@ function getCurrentDate() {
 	return today;
 }
 
-async function AllTodayHabits(req, res) {
-	try {
-		const habit_data = await Habit_Data.AllTodayHabits;
-		res.status(200).json(habit_data);
-	} catch (err) {
-		res.status(404).json({ err });
-	}
-}
-
 async function Homepage(req, res) {
 	try {
 		let results = await Habit_Data.homepage(req.params.id);
@@ -77,6 +67,5 @@ module.exports = {
 	displayEverything,
 	TodayHabit,
 	AllHabitHistory,
-	AllTodayHabits,
 	Homepage
 };
