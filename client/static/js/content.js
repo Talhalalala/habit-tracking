@@ -92,7 +92,7 @@ function renderHabits(habitData) {
 	habit.setAttribute("class", "habit-class");
 	goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every day`;
 	if (habitData.streak) {
-		streak.textContent = `You've hit your goal ${habitData.streak} times in a row!`;
+		streak.textContent = `You are on a ${habitData.streak} day streak! Keep it up!`;
 	} else {
 		streak.textContent = "You haven't achieved this goal recently!";
 	}
@@ -117,10 +117,11 @@ function createMoreInfoButton(id) {
 async function moreInfoAboutHabit(e) {
 	e.preventDefault();
 	const habitId = e.target.classList[0];
+	console.log("habit id", habitId);
 	const userId = localStorage.getItem("userId");
 	const habitData = await getInfoAboutHabit(habitId, userId);
 	console.log("habit data", habitData);
-	e.target.remove();
+	// e.target.remove();
 	makeHabitInformationForm(habitData[0]);
 }
 
@@ -149,15 +150,15 @@ function makeHabitInformationForm(habitData) {
 		habitInfo.setAttribute("class", "habit-details");
 		habitInfo.textContent = `You are currently at ${habitData.habit_amount} ${habitData.units}.`;
 		postDiv.appendChild(habitInfo);
-		
+
 		const fields = [
 			{
 				tag: "label",
-				textContent:`Add ${habitData.units}:addlitre" ` ,
-				
+				textContent: `Add ${habitData.units}:addlitre" `,
+
 				attributes: { for: "amount" }
 			},
-			{ tag: "input", attributes: { type: "text", name: "amount"} },
+			{ tag: "input", attributes: { type: "text", name: "amount" } },
 			{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
 		];
 		const form = document.createElement("form");

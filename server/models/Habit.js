@@ -1,4 +1,5 @@
 const db = require("../db_config/config");
+const Habit_Data = require("./HabitData");
 
 const User = require("./User");
 
@@ -17,8 +18,8 @@ class Habit {
 	static allUserHabits(user_id) {
 		return new Promise(async (res, rej) => {
 			try {
-				let result = await db.query(`SELECT * from habits where user_ID = $1;`, [user_id]);
-				let habits = result.rows.map(r => new Habit(r));
+				let results = await db.query(`SELECT * from habits where user_id = $1;`, [user_id]);
+				let habits = results.rows.map(r => new Habit(r));
 				res(habits);
 			} catch (err) {
 				rej(`Error retrieving habits: ${err}`);
@@ -26,15 +27,16 @@ class Habit {
 		});
 	}
 
-	static OneUserHabit(user_id, habit_id) {
+	static OneUserHabit(habit_id) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				let result = await db.query("SELECT * from habits where habit_ID = $1 AND user_ID = $2;", [
-					habit_id,
-					user_id
-				]);
-				let habit = result.rows.map(r => new Habit(r));
-				resolve(habit);
+				let results = await db.query("SELECT * from habits where habit_ID = $1;", [habit_id]);
+				if (results.rows.length) {
+					let habit = new Habit(results.rows[0]);
+					resolve(habit);
+				} else {
+					throw "This user has no habits with this habit_id";
+				}
 			} catch (err) {
 				reject(`Error retrieving the habit: ${err}`);
 			}
@@ -47,15 +49,28 @@ class Habit {
 	static create(habitData) {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const { habit, frequency, goal, units, user_id } = habitData;
+				const { habit, goal, units, user_ID } = habitData;
 				let newHabit = await db.query(
-					"INSERT INTO habits (habit, frequency, goal, units, user_ID) VALUES ($1, $2, $3, $4, $5) RETURNING *;",
-					[habit, frequency, goal, units, user_id]
+					"INSERT INTO habits (habit, goal, units, user_id) VALUES ($1, $2, $3, $4) RETURNING *;",
+					[habit, goal, units, user_id]
 				);
 				let r = new Habit(newHabit.rows[0]);
 				resolve(r);
 			} catch (err) {
 				reject("Habit could not be created");
+			}
+		});
+	}
+
+	get destroy() {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const result = await db.query("DELETE FROM habits WHERE habit_id = $1 RETURNING user_ID", [
+					this.habit_id
+				]);
+				resolve(`Habit ${result.habit} was deleted`);
+			} catch (err) {
+				reject("Habit could not be deleted");
 			}
 		});
 	}
@@ -71,6 +86,27 @@ class Habit {
 			}
 		});
 	}
+
+	static readCurrentHabitStreak(user_id, habit_id) {
+		return new Promise(async (res, rej) => {
+			try {
+				let results = await db.query(
+					"SELECT streak FROM habits WHERE user_id = $1 AND habit_id = $2;",
+					[user_id, habit_id]
+				);
+				if (results.rows.length) {
+					let event = new Habit_Data(results.rows[0]);
+					res(event);
+				} else {
+					throw "No given streak for this user_id and habit_id";
+				}
+			} catch (err) {
+				rej(`Error retrieving streak data for this habit_id: ${err}`);
+			}
+		});
+	}
+
+	// static readHabitGoal
 
 	get destroy() {
 		return new Promise(async (resolve, reject) => {

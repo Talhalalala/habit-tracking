@@ -20,7 +20,7 @@ async function displayAll(req, res) {
 
 async function displayAHabit(req, res) {
 	try {
-		const show = await Habit.OneUserHabit(req.body.user_id, req.params.id);
+		const show = await Habit.OneUserHabit(req.params.id);
 		res.status(200).json(show);
 	} catch (err) {
 		res.status(404).json({ err });
