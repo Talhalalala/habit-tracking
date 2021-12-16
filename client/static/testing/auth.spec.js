@@ -10,20 +10,17 @@
  global.fetch = require("jest-fetch-mock");
  let app;
  
- describe("auth.js", () => {
-     beforeEach(() => {
-         document.documentElement.innerHTML = html.toString();
-         app = require("../js/auth.js");
-     });
- 
-     afterEach(() => {
-         fetch.resetMocks();
-     });
+ describe("auth", () => {
+	beforeEach(() => {
+		document.documentElement.innerHTML = html.toString();
+		app = require("../js/auth.js");
+	});
 
-    /*test('requestsLogin calls fetch', async ()=>{
-        await requests.requestLogin({});
-        expect(fetch).toHaveBeenCalled();
-    }) */
+	afterEach(() => {
+		fetch.resetMocks();
+	}); 
+    
+    
     describe("requestLogin", () => {
 		it("makes a fetch request", () => {
 			app.requestLogin({});
@@ -33,13 +30,33 @@
 
     describe("requestRegistration", () => {
 		it("makes a fetch request", () => {
-			app.requestRegistration({});
-			expect(fetch).toHaveBeenCalled();
+			app.requestRegistration(1);
+			expect(fetch).toHaveBeenCalled(1);
 		});
 	}); 
 
-    });
-    
+    describe("login", () => {
+        it("login directs to dashboard", () => {
+        app.login();
+        const user = document.querySelector("today");
+        expect(user).toBeTruthy();
 
-})
+    });
+
+    describe("logout" , () => {
+        it("logs out the user", () => {
+        app.logout();
+        
  
+    });
+ });
+
+    describe("currentUser", () => {
+        it("checks the username", () => {
+        app.currentUser();
+        const username = document.querySelector("");
+        expect(username).toBeTruthy();
+        });
+
+    });
+});
