@@ -27,20 +27,28 @@ describe("requests", () => {
 		});
 	});
 
-	describe("getInfoAboutHabit", () => {
-		it("makes a fetch request", () => {
-			app.getInfoAboutHabit(1, 1);
-			expect(fetch).toHaveBeenCalledTimes(1);
-		});
-	});
-
 	describe("updateHabit", () => {
 		it("makes a fetch request", () => {
-			const link = document.createElement("a");
-			link.addEventListener("click", app.updateHabit);
-			link.click();
+			let form = document.createElement("form");
+			let habitData = { habit_id: 1 };
+			form.addEventListener("submit", e => {
+				app.updateHabit(e, habitData);
+			});
+			form.submit();
 			expect(fetch).toHaveBeenCalledTimes(1);
 		});
+
+		// it("warns about an error", () => {
+		// 	fetch.mockResponseOnce(JSON.stringify({ err: "Test error" }));
+		// 	let consoleSpy = jest.spyOn(console, "warn");
+		// 	let form = document.createElement("form");
+		// 	let habitData = { habit_id: 1 };
+		// 	form.addEventListener("submit", async e => {
+		// 		await app.updateHabit(e, habitData);
+		// 	});
+		// 	form.submit();
+		// 	expect(consoleSpy).toHaveBeenCalled();
+		// });
 	});
 
 	describe("addHabit", () => {
@@ -48,6 +56,20 @@ describe("requests", () => {
 			const form = document.createElement("form");
 			form.addEventListener("submit", app.addHabit);
 			form.submit();
+			expect(fetch).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe("removeHabit", () => {
+		it("makes a fetch request", () => {
+			app.removeHabit(1);
+			expect(fetch).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe("getHistory", () => {
+		it("makes a fetch request", () => {
+			app.getHistory(1);
 			expect(fetch).toHaveBeenCalledTimes(1);
 		});
 	});
