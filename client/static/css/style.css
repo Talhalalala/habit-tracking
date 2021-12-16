@@ -167,9 +167,7 @@ nav {
 }
 
 .habit-details {
-	margin: 35%;
-	margin-top: 50px;
-	margin-bottom: -20px;
+	margin: 25px auto 25px auto;
 	justify-content: space-evenly;
 	width: 25%;
 	display: grid;
@@ -180,17 +178,22 @@ nav {
 }
 
 .delete-habit {
-	margin: 50%;
-	margin-top: 50px;
-	margin-bottom: -20px;
+	margin: 25px auto 25px auto;
+	display: block;
 	justify-content: space-evenly;
-	width: 25%;
+	width: 8%;
 }
 
 .habit-history {
-	margin: 60%;
-	margin-top: 50px;
-	margin-bottom: -20px;
+	margin: 25px auto 25px auto;
+	display: block;
 	justify-content: space-evenly;
-	width: 25%;
+	width: 8%;
+}
+
+.addlitre {
+	margin: 25px auto 25px auto;
+	display: block;
+	justify-content: space-evenly;
+	width: 8%;
 }
