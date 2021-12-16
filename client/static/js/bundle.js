@@ -7,7 +7,7 @@ async function requestLogin(e) {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
 		};
-		const r = await fetch(`http://localhost:3000/auth/login`, options);
+		const r = await fetch(`https://habit-tracker-fp.herokuapp.com/auth/login`, options);
 		const data = await r.json();
 		if (!data.success) {
 			throw new Error("Login not authorised");
@@ -29,7 +29,7 @@ async function requestRegistration(e) {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
 			};
-			const r = await fetch(`http://localhost:3000/auth/register`, options);
+			const r = await fetch(`https://habit-tracker-fp.herokuapp.com/auth/register`, options);
 			const data = await r.json();
 			if (data.err) {
 				throw Error(data.err);
@@ -557,7 +557,7 @@ async function getHabits(id) {
 				Authorization: localStorage.getItem("token")
 			})
 		};
-		const response = await fetch(`http://localhost:3000/habitdata/homepage/${id}`, options); // get correct route to get names of all habits
+		const response = await fetch(`https://habit-tracker-fp.herokuapp.com/habitdata/homepage/${id}`, options); // get correct route to get names of all habits
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -582,7 +582,7 @@ async function updateHabit(e, habitData) {
 			}),
 			body: JSON.stringify(bodyObject)
 		};
-		const response = await fetch("http://localhost:3000/habitdata/", options); //get route for updating the habit
+		const response = await fetch("https://habit-tracker-fp.herokuapp.com/habitdata/", options); //get route for updating the habit
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -605,7 +605,7 @@ async function addHabit(e) {
 			}),
 			body: JSON.stringify(bodyObject)
 		};
-		const r = await fetch(`http://localhost:3000/habit/create`, options);
+		const r = await fetch(`https://habit-tracker-fp.herokuapp.com/habit/create`, options);
 		const data = await r.json();
 		if (data.err) {
 			console.warn(data.err);
@@ -625,7 +625,7 @@ async function removeHabit(id) {
 				"Content-Type": "application/json"
 			})
 		};
-		await fetch(`http://localhost:3000/habit/${id}`, options);
+		await fetch(`https://habit-tracker-fp.herokuapp.com/habit/${id}`, options);
 	} catch (err) {
 		console.warn(err);
 	}
@@ -638,7 +638,7 @@ async function getHistory(id) {
 				Authorization: localStorage.getItem("token")
 			})
 		};
-		const response = await fetch(`http://localhost:3000/habitdata/all/${id}`, options); // get correct route to get names of all habits
+		const response = await fetch(`https://habit-tracker-fp.herokuapp.com/habitdata/all/${id}`, options); // get correct route to get names of all habits
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
