@@ -1,5 +1,5 @@
 const Habit = require("../models/Habit");
-const User = require("../models/user");
+const User = require("../models/User");
 const Habit_Data = require("../models/HabitData");
 
 async function createAndOrUpdate(req, res) {
