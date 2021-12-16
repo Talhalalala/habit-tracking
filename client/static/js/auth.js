@@ -35,10 +35,12 @@ async function requestRegistration(e) {
 			}
 			requestLogin(e);
 		} else {
-			const main = document.querySelector("main");
 			const message = document.createElement("p");
+			message.id = "error-message";
 			message.textContent = "Please make sure the password and password comfirmation match";
-			main.appendChild(message);
+			const submitButton = document.querySelector(".submit");
+			const form = document.querySelector("#registerForm");
+			form.insertBefore(message, submitButton);
 		}
 	} catch (err) {
 		console.warn(err);
