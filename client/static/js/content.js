@@ -100,7 +100,7 @@ function renderHabits(habitData) {
 	streak.setAttribute("class", "streak-button");
 	habit.textContent = `${habitData.habit[0].toUpperCase()}${habitData.habit.substring(1)}`;
 	habit.setAttribute("class", "habit-class");
-	goal.textContent = `Goal: ${habitData.goal} ${habitData.units} every day`;
+	goal.textContent = `Goal: ${habitData.goal} ${habitData.units.toLowerCase()} every day`;
 	if (habitData.streak) {
 		streak.textContent = `You are on a ${habitData.streak} day streak! Keep it up!`;
 	} else {
@@ -127,7 +127,7 @@ function createMoreInfoButton(habitData, post) {
 		const showLessInfoButton = createLessInfoButton(habitData);
 		post.appendChild(showLessInfoButton);
 	});
-	moreinfobutton.setAttribute("class", `${habitData.habit_id}`);
+	moreinfobutton.setAttribute("class", `${habitData.habit_id} show-button more`);
 	moreinfobutton.textContent = "More Info";
 	return moreinfobutton;
 }
@@ -139,7 +139,7 @@ function createLessInfoButton(habitData) {
 		e.preventDefault();
 		showlessInfoAboutHabit(e, habitData);
 	});
-	showLessInfoButton.setAttribute("class", `show-button`);
+	showLessInfoButton.setAttribute("class", `show-button less`);
 	showLessInfoButton.textContent = "Less Info";
 	return showLessInfoButton;
 }
@@ -172,7 +172,7 @@ function makeHabitInformationDiv(habitData) {
 		const habitInfo = document.createElement("p");
 		habitInfo.setAttribute("class", "habit-details");
 		let habitAmount = habitData.habit_amount ? habitData.habit_amount : 0;
-		habitInfo.textContent = `You are currently at ${habitAmount} ${habitData.units} today.`;
+		habitInfo.textContent = `You are currently at ${habitAmount} ${habitData.units.toLowerCase()} today.`;
 		habitInfoDiv.appendChild(habitInfo);
 
 		const fields = [
@@ -180,10 +180,10 @@ function makeHabitInformationDiv(habitData) {
 				tag: "label",
 				textContent: `Add ${habitData.units.toLowerCase()}`,
 
-				attributes: { for: "amount" }
+				attributes: { for: "amount", class: "add-units-label" }
 			},
-			{ tag: "input", attributes: { type: "text", name: "habit_amount" } },
-			{ tag: "input", attributes: { type: "submit", value: "Log Data" } }
+			{ tag: "input", attributes: { type: "text", name: "habit_amount", class: "habit-amount" } },
+			{ tag: "input", attributes: { type: "submit", value: "Log Data", class: "log-data" } }
 		];
 		const form = document.createElement("form");
 		form.setAttribute("class", `addlitre`);
@@ -210,11 +210,23 @@ function makeHabitInformationDiv(habitData) {
 		habitInfoDiv.appendChild(form);
 	}
 
+	const buttonsDiv = document.createElement("div");
+	buttonsDiv.classList.add("habit-info-buttons");
+
 	// create habit history button
 	const historyButton = createHabitHistoryButton(habitData);
-	habitInfoDiv.append(historyButton);
+	buttonsDiv.append(historyButton);
 
 	// create delete habit button
+	const deleteButton = createDeleteHabitButton(habitData);
+	buttonsDiv.appendChild(deleteButton);
+
+	habitInfoDiv.appendChild(buttonsDiv);
+
+	return habitInfoDiv;
+}
+
+function createDeleteHabitButton(habitData) {
 	const deleteButton = document.createElement("button");
 	deleteButton.setAttribute("class", "delete-habit");
 	deleteButton.addEventListener("click", async e => {
@@ -227,9 +239,7 @@ function makeHabitInformationDiv(habitData) {
 		}
 	});
 	deleteButton.textContent = "Delete habit";
-	habitInfoDiv.appendChild(deleteButton);
-
-	return habitInfoDiv;
+	return deleteButton;
 }
 
 // creates a button that will display historical information about days the user has previously added data for the habit
@@ -253,38 +263,56 @@ function createHabitHistoryButton(habitData) {
 async function showHistory(habitData) {
 	const habitInfoDiv = document.querySelector(`div[name='${habitData.habit_id}'] > .habit-info`);
 	const deleteButton = document.querySelector(`div[name='${habitData.habit_id}'] .delete-habit`);
+	const buttonsDiv = document.querySelector(
+		`div[name='${habitData.habit_id}'] .habit-info-buttons`
+	);
 	const history = await getHistory(habitData.habit_id); // fetches the history of the habit
+	console.log(history);
 	const div = document.createElement("div");
 	div.setAttribute("class", "history-div");
-	history.forEach(data => {
-		const historyElement = createHistoryElement(data, habitData);
-		div.appendChild(historyElement);
-	});
-
+	if (history.err) {
+		const message = document.createElement("p");
+		message.classList.add("no-history");
+		message.textContent = "You have not tracked any data for this habit yet, start now!";
+		div.appendChild(message);
+	} else {
+		history.forEach(data => {
+			const historyElement = createHistoryElement(data, habitData);
+			div.appendChild(historyElement);
+		});
+	}
 	//hide history button will remove the history and display again the show history button
 	const hideHistoryButton = document.createElement("button");
+	hideHistoryButton.setAttribute("class", "habit-history");
 	hideHistoryButton.textContent = "Hide habit history";
 	hideHistoryButton.addEventListener("click", e => {
 		e.preventDefault();
 		div.remove();
+		hideHistoryButton.remove();
 		const historyButton = createHabitHistoryButton(habitData);
-		habitInfoDiv.insertBefore(historyButton, deleteButton); // displays the history in the cirrect place in the html
+		buttonsDiv.insertBefore(historyButton, deleteButton); // displays the history in the correct place in the html
 	});
-	div.appendChild(hideHistoryButton);
-	habitInfoDiv.insertBefore(div, deleteButton);
+	buttonsDiv.insertBefore(hideHistoryButton, deleteButton);
+	habitInfoDiv.insertBefore(div, buttonsDiv);
 }
 
 // creates a single history element with the information for one day of the habit
 function createHistoryElement(data, habitData) {
-	const habitDiv = document.createElement("div");
-	habitDiv.classList.add(`achieved-${data.achieved}`); // class will be 'achieved-false' or 'achieved-true'
+	const date = data.date.split("T")[0].split("-"); // gets only the relevant date information and splits it into year, month, day
+	const achieved = data.achieved
+		? "Well done! You hit your goal!"
+		: "You didn't quite hit your goal on this day";
+	const div = document.createElement("div");
+	div.classList.add("history-item");
 	const datePara = document.createElement("p");
-	datePara.textContent = `${data.date.split("T")[0]}:`;
-	const amountPara = document.createElement("p");
-	amountPara.textContent = `${data.amount} ${habitData.units.toLowerCase()}`;
-	habitDiv.appendChild(datePara);
-	habitDiv.appendChild(amountPara);
-	return habitDiv;
+	datePara.classList.add("history-date");
+	const textPara = document.createElement("p");
+	datePara.textContent = `${date[2]}/${date[1]}/${date[0]}`;
+	textPara.textContent = `${data.amount} ${habitData.units.toLowerCase()}. ${achieved}`;
+	div.classList.add(`achieved-${data.achieved}`); // class will be 'achieved-false' or 'achieved-true'
+	div.appendChild(datePara);
+	div.appendChild(textPara);
+	return div;
 }
 
 // renders a form to create a new habit
@@ -292,19 +320,28 @@ function renderNewHabit() {
 	const main = document.querySelector("main");
 	const fields = [
 		{ tag: "label", textContent: "Habit to track:", attributes: { for: "habit", class: "label" } },
-		{ tag: "input", attributes: { type: "text", name: "habit", class: "input" } },
+		{
+			tag: "input",
+			attributes: { type: "text", name: "habit", class: "input", placeholder: "Eg. Drinking water" }
+		},
 		{
 			tag: "label",
 			textContent: "Daily goal:",
 			attributes: { for: "goal", class: "label" }
 		},
-		{ tag: "input", attributes: { type: "text", name: "goal", class: "input" } },
+		{
+			tag: "input",
+			attributes: { type: "text", name: "goal", class: "input", placeholder: "Eg. 8" }
+		},
 		{
 			tag: "label",
 			textContent: "The goal is measured in:",
 			attributes: { for: "units", class: "label" }
 		},
-		{ tag: "input", attributes: { type: "text", name: "units", class: "input" } },
+		{
+			tag: "input",
+			attributes: { type: "text", name: "units", class: "input", placeholder: "Eg. cups" }
+		},
 		{ tag: "input", attributes: { type: "submit", value: "Add habit", class: "submit" } }
 	];
 
@@ -324,8 +361,20 @@ function renderNewHabit() {
 	form.addEventListener("submit", async e => {
 		try {
 			e.preventDefault();
-			await addHabit(e); // adds the habit to the database for that user
-			window.location.hash = "#habits";
+			console.log("adding");
+			const data = await addHabit(e); // adds the habit to the database for that user
+			if (data.err) {
+				// if the habit is not added, displays a message checking the user has entered their goal as a number
+				const message = document.createElement("p");
+				message.id = "error-message";
+				message.textContent =
+					"Something went wrong, please make sure your goal is entered as a number";
+				const submitButton = document.querySelector(".submit");
+				const form = document.querySelector("#newHabitForm");
+				form.insertBefore(message, submitButton);
+			} else {
+				window.location.hash = "#habits";
+			}
 		} catch (err) {
 			console.warn(err);
 		}

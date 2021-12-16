@@ -92,7 +92,6 @@ async function getHistory(id) {
 		const data = await response.json();
 		if (data.err) {
 			console.warn(data.err);
-			logout();
 		}
 		return data;
 	} catch (err) {
