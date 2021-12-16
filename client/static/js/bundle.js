@@ -21,17 +21,26 @@ async function requestLogin(e) {
 async function requestRegistration(e) {
 	e.preventDefault();
 	try {
-		const options = {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
-		};
-		const r = await fetch(`http://localhost:3000/auth/register`, options);
-		const data = await r.json();
-		if (data.err) {
-			throw Error(data.err);
+		const password = document.querySelector("[name='password']").value;
+		const passwordConfirm = document.querySelector("[name='passwordConfirmation']").value;
+		if (password === passwordConfirm) {
+			const options = {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+			};
+			const r = await fetch(`http://localhost:3000/auth/register`, options);
+			const data = await r.json();
+			if (data.err) {
+				throw Error(data.err);
+			}
+			requestLogin(e);
+		} else {
+			const main = document.querySelector("main");
+			const message = document.createElement("p");
+			message.textContent = "Please make sure the password and password comfirmation match";
+			main.appendChild(message);
 		}
-		requestLogin(e);
 	} catch (err) {
 		console.warn(err);
 	}
@@ -60,7 +69,7 @@ module.exports = { requestLogin, requestRegistration, login, logout, currentUser
 
 },{}],2:[function(require,module,exports){
 const { requestLogin, requestRegistration, currentUser } = require("./auth");
-const { getHabits, updateHabit, addHabit, removeHabit } = require("./requests");
+const { getHabits, updateHabit, addHabit, removeHabit, getHistory } = require("./requests");
 
 // generates the login form
 function renderLoginForm() {
@@ -148,6 +157,7 @@ async function renderToday() {
 	}
 }
 
+// displays the basic information about a habit the user is tracking - the name, goal, and if they have a streak
 function renderHabits(habitData) {
 	const feed = document.querySelector("#feed");
 	const post = document.createElement("div");
@@ -167,7 +177,7 @@ function renderHabits(habitData) {
 		streak.textContent = "You haven't achieved this goal recently!";
 	}
 
-	const moreinfobutton = createMoreInfoButton(habitData);
+	const moreinfobutton = createMoreInfoButton(habitData, post);
 
 	post.appendChild(habit);
 	post.appendChild(goal);
@@ -176,51 +186,69 @@ function renderHabits(habitData) {
 	feed.appendChild(post);
 }
 
-function createMoreInfoButton(habitData) {
+// creates a button that will display more information about the habit
+function createMoreInfoButton(habitData, post) {
 	const moreinfobutton = document.createElement("button");
 	moreinfobutton.addEventListener("click", e => {
 		e.preventDefault();
 		e.target.remove();
-		makeHabitInformationForm(habitData);
+		const form = makeHabitInformationDiv(habitData);
+		post.appendChild(form);
+		const showLessInfoButton = createLessInfoButton(habitData);
+		post.appendChild(showLessInfoButton);
 	});
 	moreinfobutton.setAttribute("class", `${habitData.habit_id}`);
 	moreinfobutton.textContent = "More Info";
 	return moreinfobutton;
 }
 
+// creates the button to stop displaying the extra info about the habit
+function createLessInfoButton(habitData) {
+	const showLessInfoButton = document.createElement("button");
+	showLessInfoButton.addEventListener("click", e => {
+		e.preventDefault();
+		showlessInfoAboutHabit(e, habitData);
+	});
+	showLessInfoButton.setAttribute("class", `show-button`);
+	showLessInfoButton.textContent = "Less Info";
+	return showLessInfoButton;
+}
+
+// removes the div containing the update info form, habit history button and delete habit button
 function showlessInfoAboutHabit(e, habitData) {
 	e.preventDefault();
+	const postDiv = document.querySelector(`div[name='${habitData.habit_id}']`);
 	const habitId = habitData.habit_id;
-	const postDiv = document.querySelector(`div[name='${habitId}']`);
-	const form = document.querySelector(`form[name='${habitId}']`);
-	const infoPara = document.querySelector(`div[name='${habitId}'] > .habit-details`); //" > finds a child class"
-	if (form) {
-		form.remove(); //removes form
-	}
-	infoPara.remove();
-	const moreInfo = createMoreInfoButton(habitData);
+	const habitInfoDiv = document.querySelector(`div[name='${habitId}'] .habit-info`);
+	habitInfoDiv.remove();
+	const moreInfo = createMoreInfoButton(habitData, postDiv);
 	postDiv.appendChild(moreInfo);
 	e.target.remove(); //removes button
 }
 
-function makeHabitInformationForm(habitData) {
-	const postDiv = document.querySelector(`div[name='${habitData.habit_id}']`);
+// creates a div containing more information about the habit
+function makeHabitInformationDiv(habitData) {
+	const habitInfoDiv = document.createElement("div");
+	habitInfoDiv.classList.add("habit-info");
+
+	// if the user has met the goal for the day, just display a success message
 	if (habitData.habit_achieved) {
 		const success = document.createElement("p");
 		success.setAttribute("class", "habit-details");
-		success.textContent = "Amazing! You've hit your goal!";
-		postDiv.appendChild(success);
+		success.textContent = "Amazing! You've hit your goal today!";
+		habitInfoDiv.appendChild(success);
 	} else {
+		// else creates a form for a user to add any progress towards the habit
 		const habitInfo = document.createElement("p");
 		habitInfo.setAttribute("class", "habit-details");
 		let habitAmount = habitData.habit_amount ? habitData.habit_amount : 0;
 		habitInfo.textContent = `You are currently at ${habitAmount} ${habitData.units} today.`;
-		postDiv.appendChild(habitInfo);
+		habitInfoDiv.appendChild(habitInfo);
 
 		const fields = [
 			{
 				tag: "label",
-				textContent: `Add ${habitData.units}`,
+				textContent: `Add ${habitData.units.toLowerCase()}`,
 
 				attributes: { for: "amount" }
 			},
@@ -243,41 +271,93 @@ function makeHabitInformationForm(habitData) {
 		form.addEventListener("submit", async e => {
 			try {
 				e.preventDefault();
-				await updateHabit(e, habitData);
 				window.location.reload();
+				await updateHabit(e, habitData); //fetch request to update the habit progress in the database
 			} catch (err) {
 				console.warn(err);
 			}
 		});
-		postDiv.appendChild(form);
+		habitInfoDiv.appendChild(form);
 	}
 
-	// delete habit button
+	// create habit history button
+	const historyButton = createHabitHistoryButton(habitData);
+	habitInfoDiv.append(historyButton);
+
+	// create delete habit button
 	const deleteButton = document.createElement("button");
+	deleteButton.setAttribute("class", "delete-habit");
 	deleteButton.addEventListener("click", async e => {
 		try {
 			e.preventDefault();
-			await removeHabit(habitData.habit_id);
+			await removeHabit(habitData.habit_id); // fetch request to remove the habit from the database
 			window.location.reload();
 		} catch (err) {
 			console.warn(err);
 		}
 	});
 	deleteButton.textContent = "Delete habit";
-	postDiv.appendChild(deleteButton);
+	habitInfoDiv.appendChild(deleteButton);
 
-	//show less button
-	const showlessinfobutton = document.createElement("button");
-	showlessinfobutton.addEventListener("click", e => {
-		e.preventDefault();
-		showlessInfoAboutHabit(e, habitData);
-	});
-	showlessinfobutton.setAttribute("class", `show-button`);
-	showlessinfobutton.textContent = "Less Info";
-
-	postDiv.appendChild(showlessinfobutton);
+	return habitInfoDiv;
 }
 
+// creates a button that will display historical information about days the user has previously added data for the habit
+function createHabitHistoryButton(habitData) {
+	const historyButton = document.createElement("button");
+	historyButton.setAttribute("class", "habit-history");
+	historyButton.addEventListener("click", async e => {
+		try {
+			e.preventDefault();
+			e.target.remove();
+			await showHistory(habitData);
+		} catch (err) {
+			console.warn(err);
+		}
+	});
+	historyButton.textContent = "Show habit history";
+	return historyButton;
+}
+
+// displays the historical information for a particular habit
+async function showHistory(habitData) {
+	const habitInfoDiv = document.querySelector(`div[name='${habitData.habit_id}'] > .habit-info`);
+	const deleteButton = document.querySelector(`div[name='${habitData.habit_id}'] .delete-habit`);
+	const history = await getHistory(habitData.habit_id); // fetches the history of the habit
+	const div = document.createElement("div");
+	div.setAttribute("class", "history-div");
+	history.forEach(data => {
+		const historyElement = createHistoryElement(data, habitData);
+		div.appendChild(historyElement);
+	});
+
+	//hide history button will remove the history and display again the show history button
+	const hideHistoryButton = document.createElement("button");
+	hideHistoryButton.textContent = "Hide habit history";
+	hideHistoryButton.addEventListener("click", e => {
+		e.preventDefault();
+		div.remove();
+		const historyButton = createHabitHistoryButton(habitData);
+		habitInfoDiv.insertBefore(historyButton, deleteButton); // displays the history in the cirrect place in the html
+	});
+	div.appendChild(hideHistoryButton);
+	habitInfoDiv.insertBefore(div, deleteButton);
+}
+
+// creates a single history element with the information for one day of the habit
+function createHistoryElement(data, habitData) {
+	const habitDiv = document.createElement("div");
+	habitDiv.classList.add(`achieved-${data.achieved}`); // class will be 'achieved-false' or 'achieved-true'
+	const datePara = document.createElement("p");
+	datePara.textContent = `${data.date.split("T")[0]}:`;
+	const amountPara = document.createElement("p");
+	amountPara.textContent = `${data.amount} ${habitData.units.toLowerCase()}`;
+	habitDiv.appendChild(datePara);
+	habitDiv.appendChild(amountPara);
+	return habitDiv;
+}
+
+// renders a form to create a new habit
 function renderNewHabit() {
 	const main = document.querySelector("main");
 	const fields = [
@@ -314,7 +394,7 @@ function renderNewHabit() {
 	form.addEventListener("submit", async e => {
 		try {
 			e.preventDefault();
-			await addHabit(e);
+			await addHabit(e); // adds the habit to the database for that user
 			window.location.hash = "#habits";
 		} catch (err) {
 			console.warn(err);
@@ -329,7 +409,7 @@ module.exports = {
 	renderHabits,
 	renderToday,
 	renderNewHabit,
-	makeHabitInformationForm
+	makeHabitInformationDiv
 };
 
 },{"./auth":1,"./requests":4}],3:[function(require,module,exports){
@@ -494,6 +574,25 @@ async function removeHabit(id) {
 	}
 }
 
-module.exports = { getHabits, updateHabit, addHabit, removeHabit };
+async function getHistory(id) {
+	try {
+		const options = {
+			headers: new Headers({
+				Authorization: localStorage.getItem("token")
+			})
+		};
+		const response = await fetch(`http://localhost:3000/habitdata/all/${id}`, options); // get correct route to get names of all habits
+		const data = await response.json();
+		if (data.err) {
+			console.warn(data.err);
+			logout();
+		}
+		return data;
+	} catch (err) {
+		console.warn(err);
+	}
+}
+
+module.exports = { getHabits, updateHabit, addHabit, removeHabit, getHistory };
 
 },{"./auth":1}]},{},[1,2,3,4]);

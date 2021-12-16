@@ -15,10 +15,10 @@ router.post("/create", verifyToken, create);
 // displays all users habits
 router.post("/", verifyToken, displayAll);
 // display singluar habit
-router.get("/:id", displayAHabit);
+router.get("/:id", verifyToken, displayAHabit);
 // delete singular habit
 router.delete("/:id", verifyToken, destroy);
 // display all habits in habits table
-router.get("/", displayEverything); // dev end-point used to show everything in habits
+router.get("/", verifyToken, displayEverything); // dev end-point used to show everything in habits
 
 module.exports = router;

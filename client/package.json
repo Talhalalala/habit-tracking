@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watchAll --silent",
-    "coverage": "jest --coverage --watchAll --silent",
+    "test": "jest --watchAll",
+    "coverage": "jest --coverage --watchAll",
     "bundle": "browserify ./static/js/auth.js ./static/js/content.js ./static/js/layout.js ./static/js/requests.js > ./static/js/bundle.js",
     "dev": "watchify ./static/js/auth.js ./static/js/content.js ./static/js/layout.js ./static/js/requests.js -o ./static/js/bundle.js"
   },

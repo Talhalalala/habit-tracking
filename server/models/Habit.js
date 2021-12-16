@@ -4,16 +4,6 @@ const Habit_Data = require("./HabitData");
 const User = require("./User");
 
 class Habit {
-<<<<<<< HEAD
-    constructor(data){
-        this.habit_id = data.habit_data_id
-        this.id = data.user_id
-        this.habit = data.habit 
-        this.goal = data.goal
-        this.units = data.units
-        this.streak = data.streak
-    }
-=======
 	constructor(data) {
 		this.habit_id = data.habit_id;
 		this.id = data.user_id;
@@ -22,7 +12,6 @@ class Habit {
 		this.units = data.units;
 		this.streak = data.streak;
 	}
->>>>>>> 0049af3834f79febab8bccd0150d1d9002dd212e
 
 	// function to display all users active habits
 	static allUserHabits(user_id) {
@@ -53,9 +42,6 @@ class Habit {
 		});
 	}
 
-	// function to allow users to add new habits
-	// remind frontend to send user_ID
-	// looks good
 	static create(habitData) {
 		return new Promise(async (resolve, reject) => {
 			try {
@@ -95,28 +81,6 @@ class Habit {
 		});
 	}
 
-<<<<<<< HEAD
-    static readCurrentHabitStreak(user_id, habit_id){
-        return new Promise(async (res, rej) => {
-            try{
-                let results = await db.query('SELECT streak FROM habits WHERE user_id = $1 AND habit_id = $2;',
-                                            [user_id, habit_id]);
-                if (results.rows.length){
-                    let event = new Habit_Data(results.rows[0]);
-                    res(event)
-                } else {
-                    throw 'No given streak for this user_id and habit_id';
-                }
-            } catch (err) {
-                rej(`Error retrieving streak data for this habit_id: ${err}`)
-            }
-        })
-    };
-
-
-    
-    
-=======
 	static readCurrentHabitStreak(user_id, habit_id) {
 		return new Promise(async (res, rej) => {
 			try {
@@ -135,9 +99,6 @@ class Habit {
 			}
 		});
 	}
->>>>>>> 0049af3834f79febab8bccd0150d1d9002dd212e
-
-	// static readHabitGoal
 
 	get destroy() {
 		return new Promise(async (resolve, reject) => {

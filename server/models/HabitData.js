@@ -1,9 +1,5 @@
 const db = require("../db_config/config");
 
-const User = require("./User");
-
-const Habit = require("./Habit");
-
 class Habit_Data {
 	constructor(data) {
 		this.data_id = data.habit_data_id;
@@ -73,7 +69,6 @@ class Habit_Data {
 		});
 	}
 
-	// CONTINUE WORKING ON THIS
 	static checkStreak(habit_id) {
 		return new Promise(async (res, rej) => {
 			try {
@@ -128,7 +123,10 @@ class Habit_Data {
 	static readHistoricalHabitData(habit_id) {
 		return new Promise(async (res, rej) => {
 			try {
-				let results = await db.query("SELECT * FROM habit_data where habit_id = $1;", [habit_id]);
+				let results = await db.query(
+					"SELECT * FROM habit_data where habit_id = $1 ORDER BY habit_date DESC;",
+					[habit_id]
+				);
 				if (results.rows.length) {
 					let habitEvents = results.rows.map(r => new Habit_Data(r));
 					res(habitEvents);
