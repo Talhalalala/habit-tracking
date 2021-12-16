@@ -219,8 +219,8 @@ function createLessInfoButton(habitData) {
 // removes the div containing the update info form, habit history button and delete habit button
 function showlessInfoAboutHabit(e, habitData) {
 	e.preventDefault();
-	const postDiv = document.querySelector(`div[name='${habitData.habit_id}']`);
 	const habitId = habitData.habit_id;
+	const postDiv = document.querySelector(`div[name='${habitId}']`);
 	const habitInfoDiv = document.querySelector(`div[name='${habitId}'] .habit-info`);
 	habitInfoDiv.remove();
 	const moreInfo = createMoreInfoButton(habitData, postDiv);
@@ -457,8 +457,14 @@ function renderNewHabit() {
 module.exports = {
 	renderLoginForm,
 	renderRegisterForm,
-	renderHabits,
 	renderToday,
+	renderHabits,
+	createMoreInfoButton,
+	createLessInfoButton,
+	showlessInfoAboutHabit,
+	createDeleteHabitButton,
+	showHistory,
+	createHistoryElement,
 	renderNewHabit,
 	makeHabitInformationDiv
 };
