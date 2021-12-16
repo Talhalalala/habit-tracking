@@ -5,9 +5,9 @@ const nav = document.querySelector("nav");
 const main = document.querySelector("main");
 
 const publicRoutes = ["#login", "#register"];
-const privateRoutes = ["#today", "#new"];
+const privateRoutes = ["#habits", "#new"];
 
-window.addEventListener("hashchange", updateContent);
+window.addEventListener("hashchange", updateContent); //allows for multiple url pages to open (see updatemain function)
 
 function updateNav() {
 	nav.innerHTML = "";
@@ -36,7 +36,7 @@ function updateMain(path) {
 			case "#register":
 				renderRegisterForm();
 				break;
-			case "#today":
+			case "#habits":
 				renderToday();
 				break;
 			case "#new":
@@ -64,7 +64,7 @@ function updateContent() {
 	if (privateRoutes.includes(path) && !currentUser()) {
 		window.location.hash = "#login";
 	} else if (!privateRoutes.includes(path) && currentUser()) {
-		window.location.hash = "#today";
+		window.location.hash = "#habits";
 	} else {
 		updateNav();
 		updateMain(path);
@@ -72,3 +72,5 @@ function updateContent() {
 }
 
 updateContent();
+
+module.exports = { updateNav, updateMain, createNavLink, updateContent };
