@@ -4,7 +4,7 @@ const Habit_Data = require('../models/HabitData')
 
 async function createAndOrUpdate (req, res) {
     let habit_id = req.body.habit_id;
-    let amount = parseInt(req.body.habit_amount);
+    let amount = req.body.habit_amount;
     let habitDataObject = null;
 
     try {
@@ -18,7 +18,6 @@ async function createAndOrUpdate (req, res) {
             habit_amount: 0,
             habit_achieved: false
         };
-        console.log(initialHabitData);
         try{
             habitDataObject = await Habit_Data.create(initialHabitData);
         } catch (err){

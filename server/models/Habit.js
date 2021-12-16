@@ -8,7 +8,6 @@ class Habit {
         this.habit_id = data.habit_data_id
         this.id = data.user_id
         this.habit = data.habit 
-        this.frequency = data.frequency
         this.goal = data.goal
         this.units = data.units
         this.streak = data.streak
@@ -102,7 +101,7 @@ class Habit {
     };
 
 
-    // static readHabitGoal
+    
     
 
 
