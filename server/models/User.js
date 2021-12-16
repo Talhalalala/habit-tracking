@@ -63,8 +63,9 @@ class User {
 	get destroy() {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const result = await db.query("DELETE FROM users WHERE id = $1 RETURNING id;", [this.id]);
-				resolve(`User ${result.username} was deleted`);
+				const result = await db.query("DELETE FROM users WHERE user_id = $1 RETURNING user_id;", [this.id]);
+				console.log(result)
+				resolve(`User ${result.rows[0].id} was deleted`);
 			} catch (err) {
 				reject("User could not be deleted");
 			}
