@@ -20,17 +20,26 @@ async function requestLogin(e) {
 async function requestRegistration(e) {
 	e.preventDefault();
 	try {
-		const options = {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
-		};
-		const r = await fetch(`http://localhost:3000/auth/register`, options);
-		const data = await r.json();
-		if (data.err) {
-			throw Error(data.err);
+		const password = document.querySelector("[name='password']").value;
+		const passwordConfirm = document.querySelector("[name='passwordConfirmation']").value;
+		if (password === passwordConfirm) {
+			const options = {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+			};
+			const r = await fetch(`http://localhost:3000/auth/register`, options);
+			const data = await r.json();
+			if (data.err) {
+				throw Error(data.err);
+			}
+			requestLogin(e);
+		} else {
+			const main = document.querySelector("main");
+			const message = document.createElement("p");
+			message.textContent = "Please make sure the password and password comfirmation match";
+			main.appendChild(message);
 		}
-		requestLogin(e);
 	} catch (err) {
 		console.warn(err);
 	}
@@ -42,7 +51,6 @@ function login(token) {
 	localStorage.setItem("username", user.username);
 	localStorage.setItem("userEmail", user.email);
 	localStorage.setItem("userId", user.userId);
-	console.log(user);
 	window.location.hash = "#today";
 }
 

@@ -30,7 +30,6 @@ services:
         source: ./server
         target: /code
     command: bash -c "npm install && npm run seedDev && npm run dev"
-
   db:
     image: postgres:latest
     volumes:

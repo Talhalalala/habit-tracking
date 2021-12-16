@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll",
+    "coverage": "jest --coverage --watchAll",
     "bundle": "browserify ./static/js/auth.js ./static/js/content.js ./static/js/layout.js ./static/js/requests.js > ./static/js/bundle.js",
     "dev": "watchify ./static/js/auth.js ./static/js/content.js ./static/js/layout.js ./static/js/requests.js -o ./static/js/bundle.js"
   },
@@ -14,6 +15,7 @@
     "browserify": "^17.0.0",
     "coverage": "^0.4.1",
     "jest": "^27.4.5",
+    "jest-fetch-mock": "^3.0.3",
     "supertest": "^6.1.6",
     "watchify": "^4.0.0"
   }
