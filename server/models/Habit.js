@@ -56,17 +56,6 @@ class Habit {
 		});
 	}
 
-	static destroy(habit_id) {
-		return new Promise(async (res, rej) => {
-			try {
-				const del = await db.query("DELETE FROM habits WHERE habit_id = $1;", [habit_id]);
-				res("Habit has been deleted");
-			} catch (err) {
-				rej("Habit could not be deleted");
-			}
-		});
-	}
-
 	static get everything() {
 		return new Promise(async (res, rej) => {
 			try {
@@ -79,32 +68,13 @@ class Habit {
 		});
 	}
 
-	static readCurrentHabitStreak(user_id, habit_id) {
-		return new Promise(async (res, rej) => {
-			try {
-				let results = await db.query(
-					"SELECT streak FROM habits WHERE user_id = $1 AND habit_id = $2;",
-					[user_id, habit_id]
-				);
-				if (results.rows.length) {
-					let event = new Habit_Data(results.rows[0]);
-					res(event);
-				} else {
-					throw "No given streak for this user_id and habit_id";
-				}
-			} catch (err) {
-				rej(`Error retrieving streak data for this habit_id: ${err}`);
-			}
-		});
-	}
-
 	get destroy() {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const result = await db.query("DELETE FROM habits WHERE habit_id = $1 RETURNING user_ID", [
+				const result = await db.query("DELETE FROM habits WHERE habit_id = $1 RETURNING user_id", [
 					this.habit_id
 				]);
-				resolve(`Habit ${result.habit} was deleted`);
+				resolve(`Habit ${result.rows.habit_id} was deleted`);
 			} catch (err) {
 				reject("Habit could not be deleted");
 			}
