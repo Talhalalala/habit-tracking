@@ -59,16 +59,16 @@ class Habit_Data{
         return new Promise(async (res, rej) => {
             try{
                 let yesterday = await db.query(`SELECT habit_achieved FROM habit_data WHERE habit_id = $1 AND habit_date = (current_date - INTERVAL '1 day')::date`, [habit_id])
-                if (!yesterday)
+                if (!yesterday){
                 
                  
-                let results = await db.query('UPDATE habits SET streak = 0 WHERE habit_id = $1', [habit_id])
+                let results = await db.query('UPDATE habits SET streak = 0 WHERE habit_id = $1', [habit_id]);}
 
             } catch (err) {
-                rej(`Error increasing streak: ${err}`)
+                rej(`Error increasing streak: ${err}`);
             }
         })
-    }
+    };
     
     static homepage(user_id) {
         return new Promise(async (res, rej) => {
