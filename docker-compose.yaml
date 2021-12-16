@@ -12,6 +12,7 @@ services:
   #       source: ./client
   #       target: /code
   #   command: bash -c "npm run bundle"
+  
   server:
     image: node:12.18.4
     working_dir: /code
@@ -30,7 +31,15 @@ services:
         source: ./server
         target: /code
     command: bash -c "npm install && npm run seedDev && npm run dev"
-
+  web:
+    build: .
+    ports:
+      - 3000:3000
+      env_file: .env
+      depends_on:
+        - db
+      volumes:
+        - ./webapp:/opt/webapp
   db:
     image: postgres:latest
     volumes:
@@ -40,5 +49,9 @@ services:
       - POSTGRES_DB=habittracking
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postpassword
+  redis:
+    image: redis:alpine 
+    ports:
+      - "6379:6379"
 volumes:
   dbdata:
