@@ -27,9 +27,10 @@ class Habit_Data {
 	static increaseStreak(habit_id) {
 		return new Promise(async (res, rej) => {
 			try {
-				let results = await db.query("UPDATE habits SET streak = streak + 1 WHERE habit_id = $1", [
+				let results = await db.query("UPDATE habits SET streak = streak + 1 WHERE habit_id = $1 RETURNING *", [
 					habit_id
 				]);
+				res(results)
 			} catch (err) {
 				rej(`Error increasing streak: ${err}`);
 			}

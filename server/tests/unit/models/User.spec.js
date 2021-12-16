@@ -23,7 +23,7 @@ describe('User', () => {
             let userData = { id: 0, username: 'New User', email: 'newEmail@email.com', hpassword: 'test' }
             jest.spyOn(db, 'query')
                 .mockResolvedValueOnce({rows: [ userData ] });
-            const result = await Author.create('New User', 'newEmail@email.com', 'test');
+            const result = await User.create('New User', 'newEmail@email.com', 'test');
             expect(result).toBeInstanceOf(User)
         })
     });
@@ -33,7 +33,7 @@ describe('User', () => {
             let userData = { id: 0, username: 'New User', email: 'newEmail@email.com', hpassword: 'test' }
             jest.spyOn(db, 'query')
                 .mockResolvedValueOnce({rows: [ userData ] });
-            const result = await Author.findByEmail('newEmail@email.com');
+            const result = await User.findByEmail('newEmail@email.com');
             expect(result).toBeInstanceOf(User)
         })
     });
@@ -43,7 +43,7 @@ describe('User', () => {
             let userData = { id: 0, username: 'New User', email: 'newEmail@email.com', hpassword: 'test' }
             jest.spyOn(db, 'query')
                 .mockResolvedValueOnce({rows: [ userData ] });
-            const result = await Author.findById(0);
+            const result = await User.findById(0);
             expect(result).toBeInstanceOf(User)
         })
     });
@@ -51,7 +51,7 @@ describe('User', () => {
     describe('destroy', () => {
         test('it resolves with id on successful db delete query', async () => {
             jest.spyOn(db, 'query')
-                .mockResolvedValueOnce({ id: 0 });
+                .mockResolvedValueOnce({ rows: [{ id: 0 }] });
             let testUser = new User({ user_id: 0, username: 'New User', email: 'newEmail@email.com', hpassword: 'test' })
             const result = await testUser.destroy;
             expect(result).toBe('User 0 was deleted')
