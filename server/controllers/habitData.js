@@ -1,5 +1,40 @@
 const Habit = require("../models/Habit");
 const User = require("../models/user");
+<<<<<<< HEAD
+const Habit_Data = require('../models/HabitData')
+
+async function createAndOrUpdate (req, res) {
+    let habit_id = req.body.habit_id;
+    let amount = req.body.habit_amount;
+    let habitDataObject = null;
+
+    try {
+        // Attempt to retrieve
+        habitDataObject = await Habit_Data.readOneHabitData(habit_id);
+    } catch (err){
+        // Does not exist, so create a new one
+        const initialHabitData = {
+            habit_id: habit_id,
+            habit_date: getCurrentDate(),
+            habit_amount: 0,
+            habit_achieved: false
+        };
+        try{
+            habitDataObject = await Habit_Data.create(initialHabitData);
+        } catch (err){
+            res.status(501);
+        }
+    }
+
+    let newAmount = habitDataObject.amount + amount;
+    habitDataObject.update(newAmount);
+    try{
+        await Habit_Data.checkGoalAchieved(habit_id)
+    } catch(err){
+        res(501)
+    }
+    res(201);
+=======
 const Habit_Data = require("../models/HabitData");
 
 async function createAndOrUpdate(req, res) {
@@ -17,6 +52,7 @@ async function createAndOrUpdate(req, res) {
 	} catch (err) {
 		res.status(501);
 	}
+>>>>>>> 0049af3834f79febab8bccd0150d1d9002dd212e
 }
 
 async function displayEverything(req, res) {
