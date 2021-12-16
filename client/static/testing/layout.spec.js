@@ -10,7 +10,7 @@ const html = fs.readFileSync(path.resolve(__dirname, "../../index.html"), "utf8"
 global.fetch = require("jest-fetch-mock");
 let app;
 let auth = require("../js/auth.js");
-let content = require("../js/content.js");
+let { renderLoginForm } = require("../js/content.js");
 
 describe("layout", () => {
 	beforeEach(() => {
@@ -31,17 +31,6 @@ describe("layout", () => {
 		it("is defined", () => {
 			expect(app.updateNav).toBeDefined();
 		});
-
-		// it("creates a logout button if there is a user", () => {
-		// 	const nav = document.createElement("nav");
-		// 	const privateRoutes = [];
-		// 	// const currentUser = jest.fn(() => "testuser");
-		// 	jest.spyOn(auth, "currentUser").mockReturnValueOnce("testuser");
-		// 	// localStorage.setItem("username", "testUsername");
-		// 	app.updateNav();
-		// 	expect(nav.children.length).toEqual(3);
-		// 	// expect(currentUser).toHaveBeenCalled();
-		// });
 	});
 
 	describe("updateMain", () => {
@@ -54,12 +43,20 @@ describe("layout", () => {
 			expect(window.location.hash).toEqual("#login");
 		});
 
-		// it("renders the login form", () => {
-		// 	const renderLogin = jest.spyOn(content, "renderLoginForm");
-		// 	// const renderLoginForm = jest.fn();
-		// 	app.updateMain("#login");
-		// 	expect(renderLogin).toHaveBeenCalled();
-		// });
+		it("renders the login form", () => {
+			app.updateMain("#login");
+			expect(document.querySelector("#loginForm")).toBeTruthy();
+		});
+
+		it("renders the register form", () => {
+			app.updateMain("#register");
+			expect(document.querySelector("#registerForm")).toBeTruthy();
+		});
+
+		it("renders the new habit form", () => {
+			app.updateMain("#new");
+			expect(document.querySelector("#newHabitForm")).toBeTruthy();
+		});
 	});
 
 	describe("createNavLink", () => {

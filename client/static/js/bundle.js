@@ -545,7 +545,7 @@ function updateContent() {
 
 updateContent();
 
-module.exports = { updateNav, updateMain, createNavLink, updateContent };
+module.exports = { updateNav, updateMain, createNavLink, updateContent, renderLoginForm };
 
 },{"./auth":1,"./content":2}],4:[function(require,module,exports){
 const { logout } = require("./auth");
