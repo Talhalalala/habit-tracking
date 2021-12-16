@@ -1,8 +1,6 @@
 const db = require("../db_config/config");
 const Habit_Data = require("./HabitData");
 
-const User = require("./User");
-
 class Habit {
 	constructor(data) {
 		this.habit_id = data.habit_id;
