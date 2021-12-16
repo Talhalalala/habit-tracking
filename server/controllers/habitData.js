@@ -1,9 +1,5 @@
 const Habit = require("../models/Habit");
-<<<<<<< HEAD
-const User = require("../models/user");
-=======
 const User = require("../models/User");
->>>>>>> main
 const Habit_Data = require("../models/HabitData");
 
 async function createAndOrUpdate(req, res) {
