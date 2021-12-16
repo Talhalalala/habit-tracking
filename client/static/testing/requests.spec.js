@@ -29,14 +29,26 @@ describe("requests", () => {
 
 	describe("updateHabit", () => {
 		it("makes a fetch request", () => {
-			const form = document.createElement("form");
-			const habitData = { habit_id: 1 };
+			let form = document.createElement("form");
+			let habitData = { habit_id: 1 };
 			form.addEventListener("submit", e => {
 				app.updateHabit(e, habitData);
 			});
 			form.submit();
 			expect(fetch).toHaveBeenCalledTimes(1);
 		});
+
+		// it("warns about an error", () => {
+		// 	fetch.mockResponseOnce(JSON.stringify({ err: "Test error" }));
+		// 	let consoleSpy = jest.spyOn(console, "warn");
+		// 	let form = document.createElement("form");
+		// 	let habitData = { habit_id: 1 };
+		// 	form.addEventListener("submit", async e => {
+		// 		await app.updateHabit(e, habitData);
+		// 	});
+		// 	form.submit();
+		// 	expect(consoleSpy).toHaveBeenCalled();
+		// });
 	});
 
 	describe("addHabit", () => {

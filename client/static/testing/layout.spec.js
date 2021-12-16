@@ -9,15 +9,17 @@ const html = fs.readFileSync(path.resolve(__dirname, "../../index.html"), "utf8"
 
 global.fetch = require("jest-fetch-mock");
 let app;
-let auth;
-let content;
+let auth = require("../js/auth.js");
+let content = require("../js/content.js");
 
-describe("requests", () => {
+describe("layout", () => {
 	beforeEach(() => {
 		document.documentElement.innerHTML = html.toString();
 		app = require("../js/layout.js");
-		content = require("../js/content");
-		auth = require("../js/auth");
+		// jest.mock("../js/content.js", () => ({
+		// 	...jest.requireActual("../js/content.js"),
+		// 	renderLoginForm: jest.fn()
+		// }));
 	});
 
 	afterEach(() => {
@@ -46,8 +48,15 @@ describe("requests", () => {
 		it("is defined", () => {
 			expect(app.updateMain).toBeDefined();
 		});
-		// it("renders login form", () => {
+
+		it("takes you to the login page by default", () => {
+			app.updateMain();
+			expect(window.location.hash).toEqual("#login");
+		});
+
+		// it("renders the login form", () => {
 		// 	const renderLogin = jest.spyOn(content, "renderLoginForm");
+		// 	// const renderLoginForm = jest.fn();
 		// 	app.updateMain("#login");
 		// 	expect(renderLogin).toHaveBeenCalled();
 		// });
