@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { register, login, showUsers, destroy } = require('../controllers/user');
+const { register, login, showUsers, destroy } = require('../controllers/User');
 const { verifyToken } = require('../middleware/auth');
 
 // create new user
