@@ -11,6 +11,7 @@
     "unitTests": "jest --testPathPattern=/unit/ --watchAll --verbose",
     "coverage": "jest --coverage --silent --watchAll",
     "start": "node index.js",
+    "start:dev": "nodemon index.js",
     "dev": "nodemon index.js",
     "seedDev": "node db_config/seedDev.js"
   },

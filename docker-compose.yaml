@@ -7,7 +7,6 @@ services:
       - type: bind
         source: ./server
         target: /code
-
   db:
     image: postgres:latest
     environment: 
