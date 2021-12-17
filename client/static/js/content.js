@@ -267,7 +267,6 @@ async function showHistory(habitData) {
 		`div[name='${habitData.habit_id}'] .habit-info-buttons`
 	);
 	const history = await getHistory(habitData.habit_id); // fetches the history of the habit
-	console.log(history);
 	const div = document.createElement("div");
 	div.setAttribute("class", "history-div");
 	if (history.err) {
@@ -361,7 +360,6 @@ function renderNewHabit() {
 	form.addEventListener("submit", async e => {
 		try {
 			e.preventDefault();
-			console.log("adding");
 			const data = await addHabit(e); // adds the habit to the database for that user
 			if (data.err) {
 				// if the habit is not added, displays a message checking the user has entered their goal as a number
