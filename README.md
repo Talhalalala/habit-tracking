@@ -6,6 +6,8 @@ are currently tracking, add information about activities completed that day, see
 completion streak, and delete a habit if they no longer want to track it. They can also see the days
 in the past that they have tracked a particular habit.
 
+View the finished site [here](https://tusmcbhtct-habit-tracker.netlify.app/).
+
 ## Installation & Usage
 
 ### Installation
@@ -57,3 +59,10 @@ To view the client side, open `index.html` in the browser.
 - Some tests for the front end weren't initially being recognised by jest.
 - Deleting habits and adding new data to the habit for today caused some problems linking the fetch
   request to the server and then to the database.
+
+## Contributors
+
+- Emily Kral
+- Jasmine Raja
+- Talha Sadak
+- Rahib Rahman
