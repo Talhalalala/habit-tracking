@@ -3,6 +3,7 @@ const Habit = require("../models/Habit");
 async function create(req, res) {
 	try {
 		const habit = await Habit.create(req.body);
+		console.log(habit);
 		res.status(201).json(habit);
 	} catch (err) {
 		res.status(404).json({ err });
