@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "coverage": "^0.4.1",
-    "jest": "^27.4.4",
+    "jest": "^27.4.5",
     "supertest": "^6.1.6"
   }
 }
