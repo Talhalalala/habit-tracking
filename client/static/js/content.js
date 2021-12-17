@@ -77,6 +77,8 @@ async function renderToday() {
 	if (data.err) {
 		return;
 	}
+
+	// if a user doesn't have any habits, display a message prompting them to add one, else display the habits they have
 	if (data.length === 0) {
 		const noHabits = document.createElement("h3");
 		noHabits.setAttribute("class", "no-habits");
@@ -101,6 +103,8 @@ function renderHabits(habitData) {
 	habit.textContent = `${habitData.habit[0].toUpperCase()}${habitData.habit.substring(1)}`;
 	habit.setAttribute("class", "habit-class");
 	goal.textContent = `Goal: ${habitData.goal} ${habitData.units.toLowerCase()} every day`;
+
+	// if the user has a streak for this habit, display their streak, else say that they don't have one
 	if (habitData.streak) {
 		streak.textContent = `You are on a ${habitData.streak} day streak! Keep it up!`;
 	} else {
@@ -132,7 +136,7 @@ function createMoreInfoButton(habitData, post) {
 	return moreinfobutton;
 }
 
-// creates the button to stop displaying the extra info about the habit
+// creates the button to stop displaying the extra information about the habit
 function createLessInfoButton(habitData) {
 	const showLessInfoButton = document.createElement("button");
 	showLessInfoButton.addEventListener("click", e => {
@@ -144,7 +148,7 @@ function createLessInfoButton(habitData) {
 	return showLessInfoButton;
 }
 
-// removes the div containing the update info form, habit history button and delete habit button
+// removes the div containing the update information form, habit history button and delete habit button
 function showlessInfoAboutHabit(e, habitData) {
 	e.preventDefault();
 	const habitId = habitData.habit_id;
@@ -226,6 +230,7 @@ function makeHabitInformationDiv(habitData) {
 	return habitInfoDiv;
 }
 
+// creates the button that will delete a particular habit
 function createDeleteHabitButton(habitData) {
 	const deleteButton = document.createElement("button");
 	deleteButton.setAttribute("class", "delete-habit");
@@ -269,6 +274,8 @@ async function showHistory(habitData) {
 	const history = await getHistory(habitData.habit_id); // fetches the history of the habit
 	const div = document.createElement("div");
 	div.setAttribute("class", "history-div");
+
+	// if there is no history for the habit display a message, else display the history
 	if (history.err) {
 		const message = document.createElement("p");
 		message.classList.add("no-history");
@@ -301,16 +308,20 @@ function createHistoryElement(data, habitData) {
 	const achieved = data.achieved
 		? "Well done! You hit your goal!"
 		: "You didn't quite hit your goal on this day";
+
 	const div = document.createElement("div");
-	div.classList.add("history-item");
 	const datePara = document.createElement("p");
-	datePara.classList.add("history-date");
 	const textPara = document.createElement("p");
+
+	div.classList.add(`history-item achieved-${data.achieved}`); // class list will contain 'achieved-false' or 'achieved-true'
+	datePara.classList.add("history-date");
+
 	datePara.textContent = `${date[2]}/${date[1]}/${date[0]}`;
 	textPara.textContent = `${data.amount} ${habitData.units.toLowerCase()}. ${achieved}`;
-	div.classList.add(`achieved-${data.achieved}`); // class will be 'achieved-false' or 'achieved-true'
+
 	div.appendChild(datePara);
 	div.appendChild(textPara);
+
 	return div;
 }
 
